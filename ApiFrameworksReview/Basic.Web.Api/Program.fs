@@ -8,10 +8,15 @@
 
         member this.ConfigureServices (services:IServiceCollection) =
             let mvcCoreBuilder=services.AddMvcCore()
-            mvcCoreBuilder.AddFormatterMappings().AddJsonFormatters().AddCors() |> ignore
+            mvcCoreBuilder.AddFormatterMappings()
+                .AddJsonFormatters()
+                .AddCors() |> ignore
 
     [<EntryPoint>]
-    let main argv =
-        let host = WebHostBuilder().UseKestrel().UseStartup<Startup>().Build();
-        host.Run();
+    let main _ =
+        WebHostBuilder()
+            .UseKestrel()
+            .UseStartup<Startup>()
+            .Build()
+            .Run()
         0

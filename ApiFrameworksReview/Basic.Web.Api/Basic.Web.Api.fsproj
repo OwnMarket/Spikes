@@ -18,11 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Basi.Web.Api.Dtos\Basi.Web.Api.Dtos.fsproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.3.4" />
+    <ProjectReference Include="..\Basic.Web.Api.Dtos\Basic.Web.Api.Dtos.fsproj" />
   </ItemGroup>
 
 </Project>
