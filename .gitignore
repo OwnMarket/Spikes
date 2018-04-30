@@ -3,4 +3,5 @@ bin
 obj
 /.vs
 *.user
-/HashingLibrary/.vs/HashingLibrary/v15
+**/.vs
+**/bin
