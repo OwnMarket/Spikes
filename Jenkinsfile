@@ -2,13 +2,14 @@ pipeline {
   agent any
   stages {
     stage('Build') {
+      environment {
+        SOLUTION_NAME = 'Simplify'
+        BUILD_CONFIG = 'Release'
+        PROJECT_OUTPUT_FOLDER = 'Release'
+      }
       steps {
-        git(url: '${env.GIT_REPO}', branch: '${env.GIT_BRANCH}', poll: true)
+        sh 'dotnet build ${env.SOLUTION_NAME} -c ${env.BUILD_CONFIGURATION} -o ${env.PROJECT_OUTPUT_FOLDER}'
       }
     }
-  }
-  environment {
-    GIT_REPO = 'https://github.com/Chainium/Spikes.git'
-    GIT_BRANCH = 'master'
   }
 }
