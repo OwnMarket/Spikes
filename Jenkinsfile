@@ -18,4 +18,7 @@ pipeline {
       }
     }
   }
+  environment {
+    gitRepoUrl = 'https://github.com/Chainium/Spikes.git'
+  }
 }
