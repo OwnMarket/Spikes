@@ -4,5 +4,5 @@ open System
 
 [<EntryPoint>]
 let main argv =
-    printfn "This is one simple app."
+    printfn "This is one simple app.
     0 // return an integer exit code
