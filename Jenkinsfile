@@ -12,7 +12,7 @@
   stages {
     stage('Build') {
       steps {
-        git(url: ${env.GIT_REPO}, ${branch: env.GIT_BRANCH}, poll: true)
+        git(url: ${env.GIT_REPO}, branch: ${env.GIT_BRANCH}, poll: true)
         sh 'dotnet build ${env.SOLUTION_NAME} -c ${env.BUILD_CONFIGURATION} -o ${env.PROJECT_OUTPUT_FOLDER}'
       }
     }
