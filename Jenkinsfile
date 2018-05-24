@@ -7,7 +7,6 @@
     SOLUTION_NAME = 'Simplify'
     BUILD_CONFIGURATION = 'Release'
     PROJECT_OUTPUT_FOLDER = 'Release'
-    TEST_RESULTS_FOLDER = 
   }
   
   stages {
