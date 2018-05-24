@@ -6,6 +6,11 @@ pipeline {
         sh 'dotnet build $SOLUTION_NAME -c $BUILD_CONFIG -o $PROJECT_OUTPUT_FOLDER'
       }
     }
+    stage('Unit tests') {
+      steps {
+        sh 'build/run_tests.sh $SOLUTION_NAME $BUILD_CONFIG $PROJECT_OUTPUT_FOLDER /testresults *.Tests*\''
+      }
+    }
   }
   environment {
     SOLUTION_NAME = 'Simplify'
