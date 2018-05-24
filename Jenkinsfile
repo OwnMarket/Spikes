@@ -8,7 +8,8 @@ pipeline {
     }
     stage('Unit tests') {
       steps {
-        sh '/build/run_tests.sh $SOLUTION_NAME $BUILD_CONFIG $PROJECT_OUTPUT_FOLDER /testresults *.Tests*'
+        sh '''chmod +x ./build/run_tests.sh
+./build/run_tests.sh $SOLUTION_NAME $BUILD_CONFIG $PROJECT_OUTPUT_FOLDER /testresults *.Tests*'''
       }
     }
   }
