@@ -8,7 +8,7 @@ pipeline {
     }
     stage('Unit tests') {
       steps {
-        sh 'bash ./build/run_tests.sh $SOLUTION_NAME $BUILD_CONFIG $PROJECT_OUTPUT_FOLDER /testresults *.Tests*'
+        sh '/Build/run_tests.sh $SOLUTION_NAME $BUILD_CONFIG $PROJECT_OUTPUT_FOLDER /testresults *.Tests*'
       }
     }
   }
