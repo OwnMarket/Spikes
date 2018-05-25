@@ -7,8 +7,11 @@ pipeline {
       }
     }
     stage('Unit tests') {
+      environment {
+        RESULTS_OUTPUT_PATH = '/testresults'
+      }
       steps {
-        sh 'bash ./Build/run_tests.sh $SOLUTION_NAME $BUILD_CONFIG $PROJECT_OUTPUT_FOLDER /testresults *.Tests*'
+        sh 'bash ./Build/run_tests.sh $SOLUTION_NAME $BUILD_CONFIG $PROJECT_OUTPUT_FOLDER $RESULTS_OUTPUT_PATH *.Tests*'
       }
     }
   }
