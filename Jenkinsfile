@@ -24,7 +24,7 @@ pipeline {
 			  tools: [
 				MSTest(deleteOutputFiles: true, 
 				failIfNotNew: true, 
-				pattern: "./${RESULTS_OUTPUT_PATH}/**", skipNoTestFiles: false, stopProcessingIfError: true)
+				pattern: "./${RESULTS_OUTPUT_PATH}/*.*", skipNoTestFiles: false, stopProcessingIfError: true)
 			  ]
 	  }
 	}
