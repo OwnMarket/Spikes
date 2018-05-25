@@ -8,10 +8,11 @@ pipeline {
 	}
 	stage('Unit tests') {
 	  environment {
-		RESULTS_OUTPUT_PATH = '/testresults'
+		RESULTS_OUTPUT_PATH = 'testresults'
 	  }
 	  steps {
-		sh 'bash ./Build/run_tests.sh $SOLUTION_NAME $BUILD_CONFIG $PROJECT_OUTPUT_FOLDER $RESULTS_OUTPUT_PATH *.Tests*'
+		sh "mkdir $RESULTS_OUTPUT_PATH"
+		sh 'bash ./Build/run_tests.sh $SOLUTION_NAME $BUILD_CONFIG $PROJECT_OUTPUT_FOLDER ./$RESULTS_OUTPUT_PATH *.Tests*'
 		xunit testTimeMargin: "3000", 
 			  thresholdMode: 1, 
 			  thresholds: [
@@ -21,7 +22,7 @@ pipeline {
 			  tools: [
 				MSTest(deleteOutputFiles: true, 
 				failIfNotNew: true, 
-				pattern: "${RESULTS_OUTPUT_PATH}/**", skipNoTestFiles: false, stopProcessingIfError: true)
+				pattern: "./${RESULTS_OUTPUT_PATH}/**", skipNoTestFiles: false, stopProcessingIfError: true)
 			  ]
 	  }
 	}
