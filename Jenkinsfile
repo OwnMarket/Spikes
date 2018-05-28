@@ -75,16 +75,16 @@ pipeline {
             archiveArtifacts artifacts: "$PUBLISH_DIR/*.tar.gz,$PUBLISH_DIR/*.zip", fingerprint: true
         }
         success {
-            slackSend color: 'good', message: 'Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)'
+            slackSend color: "good", message: "Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
         failure {
-           slackSend color: 'danger', message: 'Failed: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)' 
+           slackSend color: "danger", message: "Failed: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
         unstable {
-            slackSend color: 'warning', message: 'Unstable: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)'
+            slackSend color: "warning", message: "Unstable: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
         changed {
-            slackSend color: 'good', message: '${env.JOB_NAME}  has changed status. More info at: (<${env.BUILD_URL}|Open>)'
+            slackSend color: "good", message: "${env.JOB_NAME}  has changed status. More info at: (<${env.BUILD_URL}|Open>)"
         }
 
     }
