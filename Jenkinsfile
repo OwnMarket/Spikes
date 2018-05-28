@@ -78,14 +78,13 @@ pipeline {
             slackSend color: 'good', message: 'Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)'
         }
         failure {
-            mail bcc: '', body: "<b>Example</b><br>\n\<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', subject: "ERROR CI: Project name -> ${env.JOB_NAME}", to: "foo@foomail.com";
+           slackSend color: 'danger', message: 'Failed: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)' 
         }
         unstable {
-            echo 'This will run only if the run was marked as unstable'
+            slackSend color: 'warning', message: 'Unstable: ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)'
         }
         changed {
-            echo 'This will run only if the state of the Pipeline has changed'
-            echo 'For example, if the Pipeline was previously failing but is now successful'
+            slackSend color: 'good', message: '${env.JOB_NAME}  has changed status. More info at: (<${env.BUILD_URL}|Open>)'
         }
 
     }
