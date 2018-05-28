@@ -19,7 +19,7 @@ done
 
 tar -zcvf $PUBLISH_DIRECTORY/$PACKAGE_NAME.tar.gz $PUBLISH_DIRECTORY/*
 
-if `zip`
+if `command -v zip >/dev/null`
 then
 	zip $PUBLISH_DIRECTORY/$PACKAGE_NAME.zip $PUBLISH_DIRECTORY/*
 else
