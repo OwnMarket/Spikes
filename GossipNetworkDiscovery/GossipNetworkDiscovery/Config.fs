@@ -3,8 +3,7 @@
 open System.IO
 open Newtonsoft.Json
 
-type Config () =    
-    // TODO add validation of config file
+type Config () =        
     static member Get configFile = 
         try 
             configFile 

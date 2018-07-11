@@ -137,15 +137,11 @@ module Membership =
             key = __.Id             
         
         member private __.GetActiveMember id =
-            let localMembers = 
-                activeMembers
-                |> Map.ofDict                   
-                |> Map.filter (fun key _ -> id = key)  
-                |> Seq.toList
-
-            match localMembers with
-                | [localMember] -> Some localMember.Value
-                | _ -> None
+            let found, localMember = activeMembers.TryGetValue id
+            if found then 
+                Some localMember
+            else 
+                None         
                 
         member private __.MergeMember inputMember = 
             if not (__.IsCurrentNode inputMember.Id) then           
@@ -202,7 +198,7 @@ module Membership =
            
             match connectedMembers with 
             | [] -> None
-            | [mem] -> [mem] |> Helpers.seqKeyValuePairToList |> Some
+            | [mem] -> Some [mem.Value]
             | _ ->                 
                 connectedMembers
                 |> Seq.shuffleG
