@@ -1,0 +1,15 @@
+{
+  "initialNodes": [
+    {
+      "ipAddress": "127.0.0.1",
+      "port": 5558,
+      "local": true
+    },
+    {
+      "ipAddress": "127.0.0.1",
+      "port": 5557
+    }
+  ],
+  "tFail": 50000,
+  "cycle": 10000
+}

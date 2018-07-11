@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="EncryptionHelper.fs" />
+    <Compile Include="Extensions.fs" />
+    <Compile Include="Helpers.fs" />
+    <Compile Include="Log.fs" />
+    <Compile Include="Dtos.fs" />
+    <Compile Include="Transport.fs" />
+    <Compile Include="Config.fs" />
+    <Compile Include="GossipNode.fs" />
+    <Compile Include="Cli.fs" />
+    <Compile Include="Program.fs" />
+    <None Include="config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NetMQ" Version="4.0.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+</Project>
