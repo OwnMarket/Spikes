@@ -55,8 +55,17 @@ module Transport =
         | GossipDiscoveryMessage m -> sendGossipDiscoveryMessage m             
         | MulticastMessage m  -> sendMulticastMessage connections sourceId m
         | GossipMessage m -> sendGossipMessage m
-       
-    let receiveMessage host receive = 
+    
+    let receiveGossipDiscoveryMessage callback message = 
+        callback message
+
+    let receiveMulticastMessage message =         
+        printfn "Received multicast message from %s " (message.ToString())
+
+    let receiveGossipMessage message =         
+        printfn "Received gossip message from %s " (message.ToString())
+
+    let receiveMessage host discoveryCallback = 
         let serverSocket = new ResponseSocket("@tcp://" + host)        
         let poller = new NetMQPoller()  
         poller.Add serverSocket
@@ -68,9 +77,10 @@ module Transport =
                 eventArgs.Socket.SendFrame "Ack"           
                 let peerMessage = unpackMessage message
                 match peerMessage with 
-                | GossipDiscoveryMessage data -> receive data
-                | MulticastMessage _ -> printfn "Multicast message received"
-                | GossipMessage _ -> printfn "Gossip message received")                             
+                | GossipDiscoveryMessage m -> receiveGossipDiscoveryMessage discoveryCallback m
+                | MulticastMessage m -> receiveMulticastMessage m 
+                | GossipMessage m -> receiveGossipMessage m
+        )
         |> ignore
 
         poller.RunAsync()

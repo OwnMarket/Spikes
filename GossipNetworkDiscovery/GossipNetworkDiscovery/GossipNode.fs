@@ -93,7 +93,7 @@ module Membership =
         member __.GetDeadMembers () =
             deadMembers |> Helpers.seqKeyValuePairToList 
 
-        member private __.StartNode () =
+        member __.StartNode () =
             Log.info "Start node .."
             __.AddMember None
             __.StartServer()       

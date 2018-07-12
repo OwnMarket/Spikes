@@ -29,10 +29,8 @@ type GossipDiscoveryMessage = {
     ActiveMembers : Member list
 }
 
-type MulticastMessage = MulticastMessage of string
-type GossipMessage = GossipMessage of string
-
 type PeerMessage = 
     | GossipDiscoveryMessage of GossipDiscoveryMessage
-    | MulticastMessage of MulticastMessage
-    | GossipMessage of GossipMessage
+    | MulticastMessage of string
+    | GossipMessage of string
+
