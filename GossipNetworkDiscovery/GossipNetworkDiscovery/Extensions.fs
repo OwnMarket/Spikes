@@ -26,3 +26,14 @@ module Seq =
         rng.GetBytes bytes
 
         Array.zip bytes a |> Array.sortBy fst |> Array.map snd
+
+module List = 
+
+    let inline distinct list = 
+        list |> Seq.distinct |> List.ofSeq
+
+    let inline except firstList secondList = 
+        firstList
+        |> Seq.ofList
+        |> Seq.filter (fun itemFirst -> secondList |> List.exists (fun itemSecond -> itemSecond = itemFirst) |> not)
+        |> Seq.toList

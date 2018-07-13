@@ -34,8 +34,9 @@ module Timer =
             timers.AddOrUpdate (id, timer, fun _ _ -> timer) |> ignore  
             
 module Helpers = 
-    let seqKeyValuePairToList seq =
+    let seqOfKeyValuePairToList seq =
         seq 
         |> Map.ofDict 
         |> Seq.toList
         |> List.map (fun x -> x.Value)
+

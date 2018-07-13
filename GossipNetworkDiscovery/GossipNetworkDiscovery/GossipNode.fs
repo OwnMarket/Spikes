@@ -12,6 +12,7 @@ module Membership =
         let activeMembers = new ConcurrentDictionary<string, Member>()
         let deadMembers = new ConcurrentDictionary<string, Member>()  
         let timers = new ConcurrentDictionary<string, System.Timers.Timer>()
+        let gossipMessages = new ConcurrentDictionary<Guid, GossipMessage * string list>()        
 
         let fanout = 2    
             
@@ -76,7 +77,20 @@ module Membership =
             
         let restartTimer id =   
             Timer.restartTimer timers id config.TFail (fun _ -> (setPendingDeadMember id))                       
-            
+         
+        let updateGossipMessagesProcessingQueue ids gossipMessage = 
+            let found, (_, processedIds) = gossipMessages.TryGetValue gossipMessage.MessageId
+            if found then                    
+                gossipMessages.AddOrUpdate(
+                    gossipMessage.MessageId,
+                    (gossipMessage, ids @ processedIds),
+                    fun _ _ -> (gossipMessage, ids @ processedIds)) |> ignore
+            else
+                gossipMessages.AddOrUpdate(
+                    gossipMessage.MessageId,
+                    (gossipMessage, ids),
+                    fun _ _ -> (gossipMessage, ids)) |> ignore    
+                        
         member __.Id  
             with get () = id   
             
@@ -85,19 +99,16 @@ module Membership =
             __.StartGossip()
        
         member __.SendMessage message = 
-            Transport.sendMessage activeMembers __.Id message            
-
-        member __.GetActiveMembers () =
-            activeMembers |> Helpers.seqKeyValuePairToList 
-        
-        member __.GetDeadMembers () =
-            deadMembers |> Helpers.seqKeyValuePairToList 
+            match message with
+            | GossipDiscoveryMessage _ | MulticastMessage _ -> 
+                Transport.sendMessage (__.GetActiveMembers()) __.Id message 
+            | GossipMessage m -> __.SendGossipMessage m                                
 
         member __.StartNode () =
             Log.info "Start node .."
             __.AddMember None
             __.StartServer()       
-
+                
         member private __.StartGossip () = 
             Log.info "Start Gossip"
             let rec loop () = 
@@ -108,7 +119,109 @@ module Membership =
                     return! loop ()
                 }
             Async.RunSynchronously (loop ()) 
+
+        member private __.SendGossipMessageToRecipient recipientId gossipMessage = 
+            let found, recipientMember = activeMembers.TryGetValue recipientId
+            if found then 
+                Log.infof "Sending gossip message to %s" recipientId
+                Transport.sendMessage [recipientMember] __.Id (GossipMessage gossipMessage)  
+                
+        member private __.ProcessGossipMessage gossipMessage recipientIds = 
+            match recipientIds with 
+            (*
+                No recipients left to send message to, remove gossip message from the processing queue
+            *)
+            | [] -> gossipMessages.TryRemove gossipMessage.MessageId |> ignore
+            (*
+                One recipient left to send the message to:
+                If gossip message was processed before, append it to the processed recipients list for that message
+                If not, add the gossip message (and the corresponding recipient) to the processing queue
+            *)
+            | [recipientId] ->                 
+                __.SendGossipMessageToRecipient recipientId gossipMessage
+                updateGossipMessagesProcessingQueue [recipientId] gossipMessage
+            (*
+                If two or more recipients left, select randomly a subset (fanout) of recipients to send the gossip message to
+                If gossip message was processed before, append the selected recipients to the processed recipients list for that message
+                If not, add the gossip message (and the corresponding recipient) to the processing queue
+            *)
+            | _ -> 
+                let selectedRecipientIds = 
+                    recipientIds  
+                    |> Seq.shuffleG
+                    |> Seq.toList
+                    |> List.take fanout
+
+                selectedRecipientIds |> List.iter (fun recipientId -> __.SendGossipMessageToRecipient recipientId gossipMessage)
+                updateGossipMessagesProcessingQueue selectedRecipientIds gossipMessage                                                      
+
+        member private __.SendGossipMessage message =  
+            let rec loop msg = 
+                async {
+                    let recipientIds = 
+                        __.GetActiveMembers() 
+                        |> List.map (fun m -> m.Id) 
+                        |> List.filter (fun i -> i <> __.Id)
+
+                    // New Message
+                    if msg.MessageId = Guid.Empty then
+                        let gossipMessage = {
+                            MessageId = Guid.NewGuid()
+                            SenderId = __.Id
+                            ProcessedIds = []
+                            Data = msg.Data
+                        }
+                    
+                        __.ProcessGossipMessage gossipMessage recipientIds
+
+                        if recipientIds.Length > 1 then 
+                            do! Async.Sleep(config.Cycle)
+                            return! loop gossipMessage
+                    // Existing message
+                    else 
+                        match gossipMessages.TryGetValue msg.MessageId with
+                        (* 
+                            Gossip message partially processed by the node, 
+                            Remove sender and the processed recipients from the new selection of recipients 
+                        *)
+                        | true, (_, processedIds) ->                     
+                            let newRecipientIds = List.except recipientIds (processedIds @ [msg.SenderId] @ msg.ProcessedIds)
+                            __.ProcessGossipMessage msg newRecipientIds
+
+                            if newRecipientIds.Length > 1 then 
+                                do! Async.Sleep(config.Cycle)
+                                return! loop msg
+                        (* 
+                            Gossip message, not processed by this node
+                            Remove sender from the new selection of recipients
+                        *)
+                        | false, (_,_) -> 
+                            let newRecipientIds = List.except recipientIds ([msg.SenderId] @ msg.ProcessedIds)
+                            __.ProcessGossipMessage msg newRecipientIds
+
+                            if recipientIds.Length > 1 then 
+                                do! Async.Sleep(config.Cycle)
+                                return! loop msg
+                }
             
+            Async.Start (loop message)        
+        
+        member private __.ReceiveGossipMessage gossipMessage = 
+            let processed, _  = gossipMessages.TryGetValue gossipMessage.MessageId 
+            if not processed then
+                Log.infof "Received gossip message from %s " (gossipMessage.SenderId.ToString())
+
+                // Add self to the list of processed Ids
+                let msg = GossipMessage {
+                    MessageId = gossipMessage.MessageId
+                    SenderId = gossipMessage.SenderId
+                    ProcessedIds = [__.Id] @ gossipMessage.ProcessedIds |> List.distinct
+                    Data = gossipMessage.Data
+                }
+
+                // Once a node is infected, propagate the message further
+                __.SendMessage msg
+
         member private __.AddMember inputMember =
             let rec loop (mem : Member option ) = 
                 match mem with 
@@ -164,7 +277,7 @@ module Membership =
 
         member private __.StartServer () =
             Log.infof "Starting server in %s" __.Id 
-            Transport.receiveMessage __.Id __.ReceiveMembers            
+            Transport.receiveMessage __.Id __.ReceiveMembers __.ReceiveGossipMessage           
             Log.info "Server started .."
             
         member private __.SendMembership inputMember = 
@@ -203,7 +316,7 @@ module Membership =
                 connectedMembers
                 |> Seq.shuffleG
                 |> Seq.take fanout
-                |> Helpers.seqKeyValuePairToList
+                |> Helpers.seqOfKeyValuePairToList
                 |> Some
 
         member private __.IncreaseHeartbeat () =             
@@ -221,4 +334,9 @@ module Membership =
                 restartTimer inputMember.Id |> ignore
             | None -> ()
             
+        member private __.GetActiveMembers () =
+            activeMembers |> Helpers.seqOfKeyValuePairToList 
+        
+        member private __.GetDeadMembers () =
+            deadMembers |> Helpers.seqOfKeyValuePairToList 
         

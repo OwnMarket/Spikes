@@ -29,43 +29,35 @@ module Transport =
         let msg = packMessage (GossipDiscoveryMessage gossipDiscoveryMessage)
         send msg gossipDiscoveryMessage.IPAddress gossipDiscoveryMessage.Port    
         
-    let sendMulticastMessage (connections: ConcurrentDictionary<'T, Member>) sourceId multicastMessage =
+    let sendMulticastMessage connections sourceId multicastMessage =
         let multicastGroupMembers = 
-            connections
-            |> Map.ofDict 
-            |> Map.filter (fun key _ -> sourceId <> key)  
-            |> Seq.toList
+            connections           
+            |> List.filter (fun m -> sourceId <> m.Id)  
            
         match multicastGroupMembers with 
         | [] -> ()           
         | _ ->                 
             multicastGroupMembers
             |> Seq.shuffleG                
-            |> Helpers.seqKeyValuePairToList                
+            |> Seq.toList
             |> List.iter (fun m ->                    
                 let msg = packMessage (MulticastMessage multicastMessage) 
                 send msg m.IPAddress m.Port)            
 
-    let sendGossipMessage gossipMessage =
-        //TODO
-        ()
+    let sendGossipMessage (members: Member list) gossipMessage =
+        let msg = packMessage (GossipMessage gossipMessage)
+        send msg members.Head.IPAddress members.Head.Port         
 
-    let sendMessage connections sourceId message =
+    let sendMessage members sourceId message =
         match message with 
         | GossipDiscoveryMessage m -> sendGossipDiscoveryMessage m             
-        | MulticastMessage m  -> sendMulticastMessage connections sourceId m
-        | GossipMessage m -> sendGossipMessage m
-    
-    let receiveGossipDiscoveryMessage callback message = 
-        callback message
+        | MulticastMessage m  -> sendMulticastMessage members sourceId m
+        | GossipMessage m -> sendGossipMessage members m   
 
     let receiveMulticastMessage message =         
         printfn "Received multicast message from %s " (message.ToString())
 
-    let receiveGossipMessage message =         
-        printfn "Received gossip message from %s " (message.ToString())
-
-    let receiveMessage host discoveryCallback = 
+    let receiveMessage host discoveryCallback gossipMessageReceivedCallback = 
         let serverSocket = new ResponseSocket("@tcp://" + host)        
         let poller = new NetMQPoller()  
         poller.Add serverSocket
@@ -77,9 +69,9 @@ module Transport =
                 eventArgs.Socket.SendFrame "Ack"           
                 let peerMessage = unpackMessage message
                 match peerMessage with 
-                | GossipDiscoveryMessage m -> receiveGossipDiscoveryMessage discoveryCallback m
+                | GossipDiscoveryMessage m -> discoveryCallback m
                 | MulticastMessage m -> receiveMulticastMessage m 
-                | GossipMessage m -> receiveGossipMessage m
+                | GossipMessage m -> gossipMessageReceivedCallback m
         )
         |> ignore
 

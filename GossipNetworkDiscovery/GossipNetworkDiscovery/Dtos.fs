@@ -1,5 +1,7 @@
 ﻿namespace Chainium.Network.Gossip
 
+open System
+
 [<CLIMutable>]
 type NodeAddress = {
     IPAddress : string
@@ -29,8 +31,15 @@ type GossipDiscoveryMessage = {
     ActiveMembers : Member list
 }
 
+type GossipMessage = {
+    MessageId : Guid
+    SenderId : string
+    ProcessedIds : string list
+    Data : string 
+}
+
 type PeerMessage = 
     | GossipDiscoveryMessage of GossipDiscoveryMessage
     | MulticastMessage of string
-    | GossipMessage of string
+    | GossipMessage of GossipMessage
 
