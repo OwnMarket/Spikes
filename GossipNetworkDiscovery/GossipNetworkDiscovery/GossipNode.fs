@@ -79,12 +79,12 @@ module Membership =
             Timer.restartTimer timers id config.TFail (fun _ -> (setPendingDeadMember id))                       
          
         let updateGossipMessagesProcessingQueue ids gossipMessage = 
-            let found, (_, processedIds) = gossipMessages.TryGetValue gossipMessage.MessageId
+            let found, result = gossipMessages.TryGetValue gossipMessage.MessageId
             if found then                    
                 gossipMessages.AddOrUpdate(
                     gossipMessage.MessageId,
-                    (gossipMessage, ids @ processedIds),
-                    fun _ _ -> (gossipMessage, ids @ processedIds)) |> ignore
+                    (gossipMessage, ids @ (snd result)),
+                    fun _ _ -> (gossipMessage, ids @ (snd result))) |> ignore
             else
                 gossipMessages.AddOrUpdate(
                     gossipMessage.MessageId,
@@ -109,7 +109,7 @@ module Membership =
             __.AddMember None
             __.StartServer()       
                 
-        member private __.StartGossip () = 
+        member  __.StartGossip () = 
             Log.info "Start Gossip"
             let rec loop () = 
                 async {                    
@@ -123,7 +123,7 @@ module Membership =
         member private __.SendGossipMessageToRecipient recipientId gossipMessage = 
             let found, recipientMember = activeMembers.TryGetValue recipientId
             if found then 
-                Log.infof "Sending gossip message to %s" recipientId
+                Log.infof "Sending gossip message %A to %s" gossipMessage.MessageId recipientId
                 Transport.sendMessage [recipientMember] __.Id (GossipMessage gossipMessage)  
                 
         member private __.ProcessGossipMessage gossipMessage recipientIds = 
@@ -168,7 +168,7 @@ module Membership =
                         let gossipMessage = {
                             MessageId = Guid.NewGuid()
                             SenderId = __.Id
-                            ProcessedIds = []
+                            ProcessedIds = [__.Id]
                             Data = msg.Data
                         }
                     
@@ -184,8 +184,8 @@ module Membership =
                             Gossip message partially processed by the node, 
                             Remove sender and the processed recipients from the new selection of recipients 
                         *)
-                        | true, (_, processedIds) ->                     
-                            let newRecipientIds = List.except recipientIds (processedIds @ [msg.SenderId] @ msg.ProcessedIds)
+                        | true, result ->                     
+                            let newRecipientIds = List.except recipientIds ((snd result) @ [msg.SenderId] @ msg.ProcessedIds)
                             __.ProcessGossipMessage msg newRecipientIds
 
                             if newRecipientIds.Length > 1 then 
@@ -195,7 +195,7 @@ module Membership =
                             Gossip message, not processed by this node
                             Remove sender from the new selection of recipients
                         *)
-                        | false, (_,_) -> 
+                        | false, _ -> 
                             let newRecipientIds = List.except recipientIds ([msg.SenderId] @ msg.ProcessedIds)
                             __.ProcessGossipMessage msg newRecipientIds
 
@@ -209,18 +209,26 @@ module Membership =
         member private __.ReceiveGossipMessage gossipMessage = 
             let processed, _  = gossipMessages.TryGetValue gossipMessage.MessageId 
             if not processed then
-                Log.infof "Received gossip message from %s " (gossipMessage.SenderId.ToString())
+                Log.infof "*** RECEIVED GOSSIP MESSAGE %A from %s " gossipMessage.MessageId gossipMessage.SenderId
+                
+                // Make sure the message is not processed twice
+                gossipMessages.AddOrUpdate(
+                    gossipMessage.MessageId,
+                    (gossipMessage, []),
+                    fun _ _ -> (gossipMessage, [])) |> ignore 
 
                 // Add self to the list of processed Ids
                 let msg = GossipMessage {
                     MessageId = gossipMessage.MessageId
-                    SenderId = gossipMessage.SenderId
+                    SenderId = __.Id
                     ProcessedIds = [__.Id] @ gossipMessage.ProcessedIds |> List.distinct
                     Data = gossipMessage.Data
                 }
 
                 // Once a node is infected, propagate the message further
                 __.SendMessage msg
+            else 
+                Log.infof "Received gossip message %A from %s -> Already processed!" gossipMessage.MessageId gossipMessage.SenderId
 
         member private __.AddMember inputMember =
             let rec loop (mem : Member option ) = 
