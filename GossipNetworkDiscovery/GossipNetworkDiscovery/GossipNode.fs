@@ -329,15 +329,25 @@ module Membership =
 
         member private __.IncreaseHeartbeat () =             
             match __.GetActiveMember __.Id with
-            | Some localMember -> 
-                localMember.Heartbeat <- Interlocked.Increment (ref localMember.Heartbeat)
+            | Some m -> 
+                let localMember = {
+                    Id = m.Id
+                    IPAddress = m.IPAddress
+                    Port = m.Port
+                    Heartbeat = m.Heartbeat + 1
+                }                
                 activeMembers.AddOrUpdate (__.Id, localMember, fun _ _ -> localMember) |> ignore   
             | None -> ()
                                                   
         member private __.ReceiveActiveMember inputMember =         
             match __.GetActiveMember inputMember.Id with
-            | Some localMember ->               
-                localMember.Heartbeat <- Interlocked.Exchange ((ref inputMember.Heartbeat), inputMember.Heartbeat)  
+            | Some m ->  
+                let localMember = {
+                    Id = m.Id
+                    IPAddress = m.IPAddress
+                    Port = m.Port
+                    Heartbeat = inputMember.Heartbeat
+                }                                
                 activeMembers.AddOrUpdate (inputMember.Id, localMember, fun _ _ -> localMember) |> ignore
                 restartTimer inputMember.Id |> ignore
             | None -> ()

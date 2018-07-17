@@ -21,7 +21,7 @@ type Member = {
     Id : string
     IPAddress : string
     Port : int
-    mutable Heartbeat : int
+    Heartbeat : int
 }
 
 [<CLIMutable>]
