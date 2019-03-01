@@ -11,20 +11,25 @@ namespace NetMQClient
     {
         string _id;
         DealerSocket client = new DealerSocket("tcp://127.0.0.1:25702");
+        NetMQQueue<NetMQMessage> messageQueue = new NetMQQueue<NetMQMessage>();
         public NetMQClient (string id)
         {
             _id = id;
             client.Options.Identity = Encoding.Unicode.GetBytes(_id);
             client.ReceiveReady += Client_ReceiveReady;
+            messageQueue.ReceiveReady += MessageQueue_ReceiveReady;
         }
 
         public async Task StartSending()
         {
             var message = string.Format("Id = {0}", _id);
             var bytes = Encoding.ASCII.GetBytes(message);
+
+
             using (var poller = new NetMQPoller())
             {
                 poller.Add(client);
+                poller.Add(messageQueue);
                 poller.RunAsync();
 
                 while (true)
@@ -32,7 +37,8 @@ namespace NetMQClient
                     var messageToServer = new NetMQMessage();
                     messageToServer.AppendEmptyFrame();
                     messageToServer.Append(message);
-                    client.SendMultipartMessage(messageToServer);
+                    messageQueue.Enqueue(messageToServer);
+                    await Task.Delay(10);
                 }
             }
         }
@@ -48,5 +54,14 @@ namespace NetMQClient
                 Console.WriteLine("REPLY {0}", result);
             }
         }
+
+        private void MessageQueue_ReceiveReady(object sender, NetMQQueueEventArgs<NetMQMessage> e)
+        {
+            while (e.Queue.TryDequeue(out NetMQMessage messageToServer, TimeSpan.FromMilliseconds(10)))
+            {
+                client.SendMultipartMessage(messageToServer);
+            }
+        }
+
     }
 }
