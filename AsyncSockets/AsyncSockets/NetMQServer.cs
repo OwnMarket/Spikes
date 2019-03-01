@@ -7,17 +7,28 @@ namespace Sockets
     public class NetMQServer
     {
         static RouterSocket server;
+        NetMQQueue<NetMQMessage> repliesQueue = new NetMQQueue<NetMQMessage>();
         public void StartListening()
         {
             Console.WriteLine("Started and listening");
             server = new RouterSocket("@tcp://*:25702");
             server.ReceiveReady += Server_ReceiveReady1;
-
+            repliesQueue.ReceiveReady += RepliesQueue_ReceiveReady;
             using (var poller = new NetMQPoller())
             {
                 poller.Add(server);
+                poller.Add(repliesQueue);
                 poller.RunAsync();
                 Console.ReadLine();
+            }
+        }
+
+        private void RepliesQueue_ReceiveReady(object sender, NetMQQueueEventArgs<NetMQMessage> e)
+        {
+            while (e.Queue.TryDequeue(out NetMQMessage messageToClient, TimeSpan.FromMilliseconds(10)))
+            {
+                server.SendMultipartMessage(messageToClient);
+                Console.WriteLine("Sent back to client");
             }
         }
 
@@ -34,8 +45,8 @@ namespace Sockets
             messageToClient.Append(clientAddress);
             messageToClient.AppendEmptyFrame();
             messageToClient.Append(clientOriginalMessage);
-            e.Socket.SendMultipartMessage(messageToClient);
-            Console.WriteLine("Sent back to client");
+            repliesQueue.Enqueue(messageToClient);
+
         }
     }
 }

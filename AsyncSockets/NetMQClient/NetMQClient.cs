@@ -10,7 +10,7 @@ namespace NetMQClient
     public class NetMQClient
     {
         string _id;
-        DealerSocket client = new DealerSocket("tcp://127.0.0.1:25702");
+        DealerSocket client = new DealerSocket(">tcp://127.0.0.1:25702");
         NetMQQueue<NetMQMessage> messageQueue = new NetMQQueue<NetMQMessage>();
         public NetMQClient (string id)
         {
