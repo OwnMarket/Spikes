@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NetMQClient": {
+      "commandName": "Project",
+      "commandLineArgs": "3"
+    }
+  }
+}

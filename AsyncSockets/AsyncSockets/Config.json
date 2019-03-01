@@ -1,0 +1,6 @@
+{
+    "ListeningAddress": "127.0.0.1:25702",
+    "NetworkBootstrapNodes": [
+        "127.0.0.1:25702"
+    ]
+}
