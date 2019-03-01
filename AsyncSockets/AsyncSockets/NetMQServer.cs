@@ -35,6 +35,7 @@ namespace Sockets
             messageToClient.AppendEmptyFrame();
             messageToClient.Append(clientOriginalMessage);
             e.Socket.SendMultipartMessage(messageToClient);
+            Console.WriteLine("Sent back to client");
         }
     }
 }

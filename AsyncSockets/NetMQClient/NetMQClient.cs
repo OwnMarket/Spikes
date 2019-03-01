@@ -16,8 +16,23 @@ namespace NetMQClient
         {
             _id = id;
             client.Options.Identity = Encoding.Unicode.GetBytes(_id);
-            client.ReceiveReady += Client_ReceiveReady;
+            //client.ReceiveReady += Client_ReceiveReady; // Use busy waiting instead of event driven handlking due to congestion of CPU
             messageQueue.ReceiveReady += MessageQueue_ReceiveReady;
+            Task.Factory.StartNew(() => ReceiveMessage(client));
+        }
+
+        private void ReceiveMessage(DealerSocket client)
+        {
+            while (true)
+            {
+                var hasmore = false;
+                client.ReceiveFrameString(out hasmore);
+                if (hasmore)
+                {
+                    var result = client.ReceiveFrameString(out hasmore);
+                    Console.WriteLine("REPLY {0}", result);
+                }
+            }
         }
 
         public async Task StartSending()
@@ -32,22 +47,22 @@ namespace NetMQClient
                 poller.Add(messageQueue);
                 poller.RunAsync();
 
-                while (true)
+                for (int i = 0; i < 1000; i++)
                 {
                     var messageToServer = new NetMQMessage();
                     messageToServer.AppendEmptyFrame();
                     messageToServer.Append(message);
                     messageQueue.Enqueue(messageToServer);
-                    await Task.Delay(10);
                 }
             }
+
+            Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!");
         }
 
         private void Client_ReceiveReady(object sender, NetMQSocketEventArgs e)
         {
             var hasmore = false;
             e.Socket.ReceiveFrameString(out hasmore);
-
             if (hasmore)
             {
                 var result = e.Socket.ReceiveFrameString(out hasmore);
