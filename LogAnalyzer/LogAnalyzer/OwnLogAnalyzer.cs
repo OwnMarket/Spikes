@@ -51,7 +51,7 @@ namespace LogAnalyzer
             {
                 var tokens = line.Replace($"INF | EVENT: {parseText}: ", "").Split(" ");
                 var date = DateTime.Parse(tokens[1]);
-                var timestamp = DateTime.ParseExact(tokens[1], "hh:mm:ss.fff", CultureInfo.InvariantCulture);
+                var timestamp = DateTime.ParseExact(tokens[1], "HH:mm:ss.fff", CultureInfo.InvariantCulture);
                 if (txCollection.TryGetValue(tokens[2], out Tuple<DateTime, DateTime> val) && val.Item1 > timestamp)
                     continue;
 
