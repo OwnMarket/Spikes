@@ -22,6 +22,7 @@ namespace LogAnalyzer
 
             var analyzer = new OwnLogAnalyzer(logsPath, nodesCount);
             analyzer.CreateReport();
+            Console.WriteLine("Report successfully generated!");
             Console.ReadLine();
         }
     }
