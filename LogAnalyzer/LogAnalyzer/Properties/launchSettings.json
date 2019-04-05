@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LogAnalyzer": {
+      "commandName": "Project",
+      "commandLineArgs": "\"c:\\temp\\node\" 4"
+    }
+  }
+}
