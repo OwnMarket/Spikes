@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PerfClient": {
+      "commandName": "Project",
+      "commandLineArgs": "c:\\Users\\Marian\\work\\Chainium\\Testing\\TestData\\Output\\perfnet_test_prepare.sh"
+    }
+  }
+}
