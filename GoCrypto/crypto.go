@@ -52,7 +52,7 @@ func hash(data []byte) string {
 }
 
 func blockchainAddress(publicKey []byte) string {
-	addressPrefix := []byte{6, 90}
+	addressPrefix := []byte{6, 90} //CH
 	_xsha256 := xsha256(publicKey)
 	_xsha160_256 := xsha160(_xsha256[:])
 	publicKeyHashWithPrefix := append(addressPrefix, _xsha160_256...)
@@ -83,9 +83,13 @@ func generateWallet() (privateKey string, address string) {
 
 func addressFromPrivateKey(privateKey string) string {
 	bytes := decode58(privateKey)
-	key, _ := crypto.ToECDSA(bytes)
-	publicKey := elliptic.Marshal(secp256k1.S256(), key.X, key.Y)
+	key, err := crypto.ToECDSA(bytes)
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
 
+	publicKey := elliptic.Marshal(secp256k1.S256(), key.X, key.Y)
 	return blockchainAddress(publicKey)
 }
 
@@ -94,17 +98,32 @@ func signMessage(networkCode []byte, privateKey string, message []byte) string {
 	networkIdBytes := xsha256(networkCode)
 	dataToSign := xsha256(append(messageHash[:], networkIdBytes[:]...))
 	privateKeyBytes := decode58(privateKey)
-	signatureBytes, _ := secp256k1.Sign(dataToSign[:], privateKeyBytes)
+	signatureBytes, err := secp256k1.Sign(dataToSign[:], privateKeyBytes)
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
 	return encode58(signatureBytes)
 }
 
 func main() {
+	// Encoding example
+	encoded := encode58([]byte("Chainium"))
+	decoded := decode58(encoded)
+	fmt.Println("Expected = Chainium\nDecoded =", string(decoded))
+	fmt.Println()
+
+	// Wallet example
+	privateKey, address := generateWallet()
+	_addressFromPrivateKey := addressFromPrivateKey(privateKey)
+	fmt.Println("Expected CHX Address = ", address)
+	fmt.Println("Computed CHX Address = ", _addressFromPrivateKey)
+	fmt.Println()
+
+	// Signing example
 	msg := []byte("Chainium")
-	networkCode := []byte("UNIT_TESTS") //TODO: replace with OWN_PUBLIC_BLOCKCHAIN_MAINNET
+	networkCode := []byte("UNIT_TESTS") //TODO: replace with OWN_PUBLIC_BLOCKCHAIN_MAINNET for mainnet!
 	sig := signMessage(networkCode, "B6WNNx9oK8qRUU52PpzjXHZuv4NUb3Z33hdju3hhrceS", msg)
-	fmt.Println("Expected = ", "6Hhxz2eP3AagR56mP4AAaKViUxHi3gM9c5weLDR48x4X4ynRBDfxsHGjhX9cni1mtCkNxbnZ783YPgMwVYV52X1w5")
-	fmt.Println("Received = ", sig)
-	sig = signMessage(networkCode, "BYeryGRWErwcHD6MDPYeUpYBH5Z2viXSDS827hPMmVvU", msg)
-	fmt.Println("Expected = ", "5d6ZJQPuQNWJNGcYhm2tNonWkqrMKinb9z39Lnhr7LYBJHMYQmkw5fejC32HMwV4FoLAxnkiYvoNyPog3fAYVo6Mu")
-	fmt.Println("Received = ", sig)
+	fmt.Println("Expected Signature = ", "6Hhxz2eP3AagR56mP4AAaKViUxHi3gM9c5weLDR48x4X4ynRBDfxsHGjhX9cni1mtCkNxbnZ783YPgMwVYV52X1w5")
+	fmt.Println("Computed Signature = ", sig)
 }
