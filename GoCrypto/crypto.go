@@ -93,17 +93,37 @@ func addressFromPrivateKey(privateKey string) string {
 	return blockchainAddress(publicKey)
 }
 
-func signMessage(networkCode []byte, privateKey string, message []byte) string {
-	messageHash := xsha256(message)
-	networkIdBytes := xsha256(networkCode)
-	dataToSign := xsha256(append(messageHash[:], networkIdBytes[:]...))
+func sign(privateKey string, dataHash [32]byte) string {
 	privateKeyBytes := decode58(privateKey)
-	signatureBytes, err := secp256k1.Sign(dataToSign[:], privateKeyBytes)
+	signatureBytes, err := secp256k1.Sign(dataHash[:], privateKeyBytes)
 	if err != nil {
 		fmt.Println(err.Error())
 		return ""
 	}
 	return encode58(signatureBytes)
+}
+
+func signMessage(networkCode []byte, privateKey string, message []byte) string {
+	messageHash := xsha256(message)
+	networkIdBytes := xsha256(networkCode)
+	dataToSign := xsha256(append(messageHash[:], networkIdBytes[:]...))
+	return sign(privateKey, dataToSign)
+}
+
+func signPlainText(privateKey string, text []byte) string {
+	dataToSign := xsha256(text)
+	return sign(privateKey, dataToSign)
+}
+
+func verifyPlainTextSignature(signature string, text []byte) string {
+	dataToVerify := xsha256(text)
+	signatureBytes := decode58(signature)
+	publicKey, err := secp256k1.RecoverPubkey(dataToVerify[:], signatureBytes)
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+	return blockchainAddress(publicKey)
 }
 
 func main() {
@@ -117,13 +137,33 @@ func main() {
 	privateKey, address := generateWallet()
 	_addressFromPrivateKey := addressFromPrivateKey(privateKey)
 	fmt.Println("Expected CHX Address = ", address)
-	fmt.Println("Computed CHX Address = ", _addressFromPrivateKey)
+	fmt.Println("Actual CHX Address = ", _addressFromPrivateKey)
 	fmt.Println()
 
-	// Signing example
+	// Signing example (use for signing Tx)
 	msg := []byte("Chainium")
 	networkCode := []byte("UNIT_TESTS") //TODO: replace with OWN_PUBLIC_BLOCKCHAIN_MAINNET for mainnet!
 	sig := signMessage(networkCode, "B6WNNx9oK8qRUU52PpzjXHZuv4NUb3Z33hdju3hhrceS", msg)
-	fmt.Println("Expected Signature = ", "6Hhxz2eP3AagR56mP4AAaKViUxHi3gM9c5weLDR48x4X4ynRBDfxsHGjhX9cni1mtCkNxbnZ783YPgMwVYV52X1w5")
-	fmt.Println("Computed Signature = ", sig)
+	expectedSig := "6Hhxz2eP3AagR56mP4AAaKViUxHi3gM9c5weLDR48x4X4ynRBDfxsHGjhX9cni1mtCkNxbnZ783YPgMwVYV52X1w5"
+	fmt.Println("Expected Signature = ", expectedSig)
+	fmt.Println("Actual Signature = ", sig)
+	fmt.Println()
+
+	// Signing plain text example
+	txt := []byte("Chainium")
+	privateKey = "3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq"
+	expectedSig = "EzCsWgPozyVT9o6TycYV6q1n4YK4QWixa6Lk4GFvwrj6RU3K1wHcwNPZJUMBYcsGp5oFhytHiThon5zqE8uLk8naB"
+	sig = signPlainText(privateKey, txt)
+	fmt.Println("Expected Signature = ", expectedSig)
+	fmt.Println("Actual Signature = ", sig)
+	fmt.Println()
+
+	// Verify plain text signature
+	privateKey, address = generateWallet()
+	expectedAddress := addressFromPrivateKey(privateKey)
+	sig = signPlainText(privateKey, txt)
+	address = verifyPlainTextSignature(sig, txt)
+	fmt.Println("Expected CHXAddress = ", expectedAddress)
+	fmt.Println("Actual CHXAddress = ", address)
+	fmt.Println()
 }
