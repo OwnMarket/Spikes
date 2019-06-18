@@ -1,17 +1,69 @@
 package main
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/sha512"
 	"fmt"
+	"io"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 	"github.com/mr-tron/base58"
 )
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Encryption
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func encrypt(text []byte, passwordHash [32]byte) []byte {
+	cypher, err := aes.NewCipher(passwordHash[:])
+	if err != nil {
+		fmt.Println(err)
+		return make([]byte, 0)
+	}
+
+	gcm, err := cipher.NewGCM(cypher)
+	if err != nil {
+		fmt.Println(err)
+		return make([]byte, 0)
+	}
+
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		panic(err.Error())
+	}
+
+	return gcm.Seal(nonce, nonce, text, nil)
+}
+
+func decrypt(encryptedText []byte, passwordHash [32]byte) []byte {
+	cypher, err := aes.NewCipher(passwordHash[:])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	gcm, err := cipher.NewGCM(cypher)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	nonceSize := gcm.NonceSize()
+	if len(encryptedText) < nonceSize {
+		fmt.Println(err)
+	}
+	nonce, encryptedText := encryptedText[:nonceSize], encryptedText[nonceSize:]
+	text, err := gcm.Open(nil, nonce, encryptedText, nil)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return text
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encoding
@@ -127,15 +179,29 @@ func verifyPlainTextSignature(signature string, text []byte) string {
 }
 
 func main() {
+	// Encryption example
+	password := []byte("pass")
+	passwordHash := xsha256(password)
+	encryptedText := encrypt([]byte("Chainium"), passwordHash)
+	decryptedText := decrypt(encryptedText, passwordHash)
+	fmt.Println("ENCRYPTION")
+	fmt.Println("===========================================")
+	fmt.Println("Expected = Chainium\nDecrypted = ", string(decryptedText))
+	fmt.Println()
+
 	// Encoding example
 	encoded := encode58([]byte("Chainium"))
 	decoded := decode58(encoded)
+	fmt.Println("ENCODING")
+	fmt.Println("===========================================")
 	fmt.Println("Expected = Chainium\nDecoded =", string(decoded))
 	fmt.Println()
 
 	// Wallet example
 	privateKey, address := generateWallet()
 	_addressFromPrivateKey := addressFromPrivateKey(privateKey)
+	fmt.Println("WALLET")
+	fmt.Println("===========================================")
 	fmt.Println("Expected CHX Address = ", address)
 	fmt.Println("Actual CHX Address = ", _addressFromPrivateKey)
 	fmt.Println()
@@ -145,6 +211,8 @@ func main() {
 	networkCode := []byte("UNIT_TESTS") //TODO: replace with OWN_PUBLIC_BLOCKCHAIN_MAINNET for mainnet!
 	sig := signMessage(networkCode, "B6WNNx9oK8qRUU52PpzjXHZuv4NUb3Z33hdju3hhrceS", msg)
 	expectedSig := "6Hhxz2eP3AagR56mP4AAaKViUxHi3gM9c5weLDR48x4X4ynRBDfxsHGjhX9cni1mtCkNxbnZ783YPgMwVYV52X1w5"
+	fmt.Println("SIGNING (tx)")
+	fmt.Println("===========================================")
 	fmt.Println("Expected Signature = ", expectedSig)
 	fmt.Println("Actual Signature = ", sig)
 	fmt.Println()
@@ -154,6 +222,8 @@ func main() {
 	privateKey = "3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq"
 	expectedSig = "EzCsWgPozyVT9o6TycYV6q1n4YK4QWixa6Lk4GFvwrj6RU3K1wHcwNPZJUMBYcsGp5oFhytHiThon5zqE8uLk8naB"
 	sig = signPlainText(privateKey, txt)
+	fmt.Println("SIGNING (plainText)")
+	fmt.Println("===========================================")
 	fmt.Println("Expected Signature = ", expectedSig)
 	fmt.Println("Actual Signature = ", sig)
 	fmt.Println()
@@ -163,6 +233,8 @@ func main() {
 	expectedAddress := addressFromPrivateKey(privateKey)
 	sig = signPlainText(privateKey, txt)
 	address = verifyPlainTextSignature(sig, txt)
+	fmt.Println("SIGNING (verifyPlainTextSign)")
+	fmt.Println("===========================================")
 	fmt.Println("Expected CHXAddress = ", expectedAddress)
 	fmt.Println("Actual CHXAddress = ", address)
 	fmt.Println()
