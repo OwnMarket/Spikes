@@ -207,6 +207,10 @@ func generateSeedFromMnemonic(mnemonic string, passphrase string) []byte {
 	return bip39.NewSeed(mnemonic, passphrase)
 }
 
+func generateSeedFromKeystore(keyStoreEncrypted []byte, passwordHash [32]byte) []byte {
+	return decrypt(keyStoreEncrypted, passwordHash)
+}
+
 func generateMasterKeyFromSeed(seed []byte) *bip32.Key {
 	masterKey, _ := bip32.NewMasterKey(seed)
 	return masterKey
@@ -268,6 +272,26 @@ func generateWalletFromSeedWithExplicitCoinIndex(seed []byte, coin uint32, keyIn
 
 func generateWalletFromSeed(seed []byte, keyIndex uint32) *WalletInfo {
 	return generateWalletFromSeedWithExplicitCoinIndex(seed, 25718, keyIndex)
+}
+
+func restoreWalletsFromSeed(seed []byte, walletCount uint32) [](*WalletInfo) {
+	var wallets [](*WalletInfo)
+	var i uint32 = 0
+	for ; i < walletCount; i++ {
+		wallet := generateWalletFromSeed(seed, i)
+		wallets = append(wallets, wallet)
+	}
+	return wallets
+}
+
+func generateWalletFromKeystore(keyStoreEncrypted []byte, passwordHash [32]byte, keyIndex uint32) *WalletInfo {
+	seed := generateSeedFromKeystore(keyStoreEncrypted, passwordHash)
+	return generateWalletFromSeed(seed, keyIndex)
+}
+
+func restoreWalletsFromKeystore(keyStoreEncrypted []byte, passwordHash [32]byte, walletCount uint32) [](*WalletInfo) {
+	seed := generateSeedFromKeystore(keyStoreEncrypted, passwordHash)
+	return restoreWalletsFromSeed(seed, walletCount)
 }
 
 func main() {
@@ -335,12 +359,15 @@ func main() {
 	mnemonic := "receive raccoon rocket donkey cherry garbage medal skirt random smoke young before scale leave hold insect foster blouse mail donkey regular vital hurt april"
 	seed := generateSeedFromMnemonic(mnemonic, "")
 	wallet = generateWalletFromSeed(seed, 0)
+	wallets := restoreWalletsFromSeed(seed, 1)
 	expectedPrivateKey := "ECPVXjz78oMdmLKbHVAAo7X7evtTh4EfnaW5Yc1SHWaj"
 	expectedAddress = "CHb5Z6Za34nv28Z3rLZ2Yd8LFikHaTqLhxB"
 	fmt.Println("HD Crypto")
 	fmt.Println("===========================================")
 	fmt.Println("Expected PrivateKey = ", expectedPrivateKey)
 	fmt.Println("Actual PrivateKey = ", wallet.PrivateKey)
+	fmt.Println("Restored PrivateKey = ", wallets[0].PrivateKey)
 	fmt.Println("Expected CHXAddress = ", expectedAddress)
 	fmt.Println("Actual CHXAddress = ", wallet.Address)
+	fmt.Println("Restored CHXAddress = ", wallets[0].Address)
 }
