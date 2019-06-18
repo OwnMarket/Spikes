@@ -204,6 +204,9 @@ func generateMnemonic() string {
 }
 
 func generateSeedFromMnemonic(mnemonic string, passphrase string) []byte {
+	if !bip39.IsMnemonicValid(mnemonic) {
+		panic("Invalid mnemonic")
+	}
 	return bip39.NewSeed(mnemonic, passphrase)
 }
 
