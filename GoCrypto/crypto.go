@@ -14,6 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 	"github.com/mr-tron/base58"
+	"github.com/tyler-smith/go-bip32"
+	"github.com/tyler-smith/go-bip39"
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,6 +180,79 @@ func verifyPlainTextSignature(signature string, text []byte) string {
 	return blockchainAddress(publicKey)
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Hierarchical Deterministic Cryptography
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func generateMnemonic() string {
+	entropy, _ := bip39.NewEntropy(256)
+	mnemonic, _ := bip39.NewMnemonic(entropy)
+	return mnemonic
+}
+
+func generateSeedFromMnemonic(mnemonic string, passphrase string) []byte {
+	return bip39.NewSeed(mnemonic, passphrase)
+}
+
+func generateMasterKeyFromSeed(seed []byte) *bip32.Key {
+	masterKey, _ := bip32.NewMasterKey(seed)
+	return masterKey
+}
+
+func generateKeystore(mnemonic string, passwordHash [32]byte) []byte {
+	seed := generateSeedFromMnemonic(mnemonic, "")
+	return encrypt(seed, passwordHash)
+}
+
+// m/44'/{coin}'/0'/0/${address}
+func newKeyFromMasterKey(masterKey *bip32.Key, coin, address uint32) (*bip32.Key, error) {
+	const _purpose uint32 = 44
+	const _account = 0
+	const _chain = 0
+
+	child, err := masterKey.NewChildKey(bip32.FirstHardenedChild + 44) // m/44'
+	if err != nil {
+		return nil, err
+	}
+
+	child, err = child.NewChildKey(bip32.FirstHardenedChild + coin) // m/44'/${coin}'
+	if err != nil {
+		return nil, err
+	}
+
+	child, err = child.NewChildKey(bip32.FirstHardenedChild + _account) // m/44'/${coin}'/0'
+	if err != nil {
+		return nil, err
+	}
+
+	child, err = child.NewChildKey(_chain) // m/44'/${coin}'/0'/0
+	if err != nil {
+		return nil, err
+	}
+
+	child, err = child.NewChildKey(address) // m/44'/${coin}'/0'/0/${address}
+	if err != nil {
+		return nil, err
+	}
+
+	return child, nil
+}
+
+func generateWalletFromSeedWithExplicitCoinIndex(seed []byte, coin uint32, keyIndex uint32) (privateKey string, address string) {
+	masterKey := generateMasterKeyFromSeed(seed)
+	childKey, err := newKeyFromMasterKey(masterKey, coin, keyIndex)
+	if err != nil {
+		fmt.Println(err)
+	}
+	privateKeyBytes := childKey.Key
+	privateKey = encode58(privateKeyBytes)
+	return privateKey, addressFromPrivateKey(privateKey)
+}
+
+func generateWalletFromSeed(seed []byte, keyIndex uint32) (privateKey string, address string) {
+	return generateWalletFromSeedWithExplicitCoinIndex(seed, 25718, keyIndex)
+}
+
 func main() {
 	// Encryption example
 	password := []byte("pass")
@@ -238,4 +313,17 @@ func main() {
 	fmt.Println("Expected CHXAddress = ", expectedAddress)
 	fmt.Println("Actual CHXAddress = ", address)
 	fmt.Println()
+
+	// HD Crypto
+	mnemonic := "receive raccoon rocket donkey cherry garbage medal skirt random smoke young before scale leave hold insect foster blouse mail donkey regular vital hurt april"
+	seed := generateSeedFromMnemonic(mnemonic, "")
+	privateKey, address = generateWalletFromSeed(seed, 0)
+	expectedPrivateKey := "ECPVXjz78oMdmLKbHVAAo7X7evtTh4EfnaW5Yc1SHWaj"
+	expectedAddress = "CHb5Z6Za34nv28Z3rLZ2Yd8LFikHaTqLhxB"
+	fmt.Println("HD Crypto")
+	fmt.Println("===========================================")
+	fmt.Println("Expected PrivateKey = ", expectedPrivateKey)
+	fmt.Println("Actual PrivateKey = ", privateKey)
+	fmt.Println("Expected CHXAddress = ", expectedAddress)
+	fmt.Println("Actual CHXAddress = ", address)
 }
