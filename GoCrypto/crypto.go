@@ -19,6 +19,15 @@ import (
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+// Types
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+type WalletInfo struct {
+	PrivateKey string
+	Address    string
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 // Encryption
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -120,7 +129,7 @@ func blockchainAddress(publicKey []byte) string {
 // Signing
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-func generateWallet() (privateKey string, address string) {
+func generateWallet() *WalletInfo {
 	key, err := ecdsa.GenerateKey(secp256k1.S256(), rand.Reader)
 	if err != nil {
 		panic(err)
@@ -132,7 +141,11 @@ func generateWallet() (privateKey string, address string) {
 	blob := key.D.Bytes()
 	copy(privateKeyBytes[32-len(blob):], blob)
 
-	return encode58(privateKeyBytes), blockchainAddress(publicKey)
+	wallet := &WalletInfo{
+		PrivateKey: encode58(privateKeyBytes),
+		Address:    blockchainAddress(publicKey),
+	}
+	return wallet
 }
 
 func addressFromPrivateKey(privateKey string) string {
@@ -238,18 +251,22 @@ func newKeyFromMasterKey(masterKey *bip32.Key, coin, address uint32) (*bip32.Key
 	return child, nil
 }
 
-func generateWalletFromSeedWithExplicitCoinIndex(seed []byte, coin uint32, keyIndex uint32) (privateKey string, address string) {
+func generateWalletFromSeedWithExplicitCoinIndex(seed []byte, coin uint32, keyIndex uint32) *WalletInfo {
 	masterKey := generateMasterKeyFromSeed(seed)
 	childKey, err := newKeyFromMasterKey(masterKey, coin, keyIndex)
 	if err != nil {
 		fmt.Println(err)
 	}
 	privateKeyBytes := childKey.Key
-	privateKey = encode58(privateKeyBytes)
-	return privateKey, addressFromPrivateKey(privateKey)
+	privateKey := encode58(privateKeyBytes)
+	wallet := &WalletInfo{
+		PrivateKey: privateKey,
+		Address:    addressFromPrivateKey(privateKey),
+	}
+	return wallet
 }
 
-func generateWalletFromSeed(seed []byte, keyIndex uint32) (privateKey string, address string) {
+func generateWalletFromSeed(seed []byte, keyIndex uint32) *WalletInfo {
 	return generateWalletFromSeedWithExplicitCoinIndex(seed, 25718, keyIndex)
 }
 
@@ -273,11 +290,11 @@ func main() {
 	fmt.Println()
 
 	// Wallet example
-	privateKey, address := generateWallet()
-	_addressFromPrivateKey := addressFromPrivateKey(privateKey)
+	wallet := generateWallet()
+	_addressFromPrivateKey := addressFromPrivateKey(wallet.PrivateKey)
 	fmt.Println("WALLET")
 	fmt.Println("===========================================")
-	fmt.Println("Expected CHX Address = ", address)
+	fmt.Println("Expected CHX Address = ", wallet.Address)
 	fmt.Println("Actual CHX Address = ", _addressFromPrivateKey)
 	fmt.Println()
 
@@ -294,7 +311,7 @@ func main() {
 
 	// Signing plain text example
 	txt := []byte("Chainium")
-	privateKey = "3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq"
+	privateKey := "3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq"
 	expectedSig = "EzCsWgPozyVT9o6TycYV6q1n4YK4QWixa6Lk4GFvwrj6RU3K1wHcwNPZJUMBYcsGp5oFhytHiThon5zqE8uLk8naB"
 	sig = signPlainText(privateKey, txt)
 	fmt.Println("SIGNING (plainText)")
@@ -304,10 +321,10 @@ func main() {
 	fmt.Println()
 
 	// Verify plain text signature
-	privateKey, address = generateWallet()
-	expectedAddress := addressFromPrivateKey(privateKey)
-	sig = signPlainText(privateKey, txt)
-	address = verifyPlainTextSignature(sig, txt)
+	wallet = generateWallet()
+	expectedAddress := addressFromPrivateKey(wallet.PrivateKey)
+	sig = signPlainText(wallet.PrivateKey, txt)
+	address := verifyPlainTextSignature(sig, txt)
 	fmt.Println("SIGNING (verifyPlainTextSign)")
 	fmt.Println("===========================================")
 	fmt.Println("Expected CHXAddress = ", expectedAddress)
@@ -317,13 +334,13 @@ func main() {
 	// HD Crypto
 	mnemonic := "receive raccoon rocket donkey cherry garbage medal skirt random smoke young before scale leave hold insect foster blouse mail donkey regular vital hurt april"
 	seed := generateSeedFromMnemonic(mnemonic, "")
-	privateKey, address = generateWalletFromSeed(seed, 0)
+	wallet = generateWalletFromSeed(seed, 0)
 	expectedPrivateKey := "ECPVXjz78oMdmLKbHVAAo7X7evtTh4EfnaW5Yc1SHWaj"
 	expectedAddress = "CHb5Z6Za34nv28Z3rLZ2Yd8LFikHaTqLhxB"
 	fmt.Println("HD Crypto")
 	fmt.Println("===========================================")
 	fmt.Println("Expected PrivateKey = ", expectedPrivateKey)
-	fmt.Println("Actual PrivateKey = ", privateKey)
+	fmt.Println("Actual PrivateKey = ", wallet.PrivateKey)
 	fmt.Println("Expected CHXAddress = ", expectedAddress)
-	fmt.Println("Actual CHXAddress = ", address)
+	fmt.Println("Actual CHXAddress = ", wallet.Address)
 }
