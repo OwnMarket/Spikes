@@ -106,7 +106,7 @@ public final class Crypto {
         ECKey ecKey = new ECKey();
         String privateKey = Encode58(ecKey.getPrivKeyBytes());
         String address = blockchainAddress(ecKey.getPubKey());
-        return WalletInfo.Create(privateKey, address);        
+        return WalletInfo.Create(privateKey, address);
     }
 
     public String AddressFromPrivateKey(String privateKey) {
@@ -125,11 +125,11 @@ public final class Crypto {
         ECKeyPair keyPair = ECKeyPair.create(new BigInteger(1, privateKeyBytes));
 
         Sign.SignatureData signature = Sign.signMessage(dataHash, keyPair, false);
-        
+
         byte[] signatureBytes = ArrayUtils.addAll(signature.getR(), signature.getS());
         int recoveryId = signature.getV() - 27;
         signatureBytes = ArrayUtils.add(signatureBytes, (byte) recoveryId);
-        
+
         return Encode58(signatureBytes);
     }
 
@@ -152,9 +152,9 @@ public final class Crypto {
         byte[] r = Arrays.copyOfRange(signatureBytes, 0, 32);
         byte[] s = Arrays.copyOfRange(signatureBytes, 32, 64);
         int recoveryId = signatureBytes[64];
-        
-        ECDSASignature ecdsaSig = new ECDSASignature(new BigInteger(1, r), new BigInteger(1, s));        
-        
+
+        ECDSASignature ecdsaSig = new ECDSASignature(new BigInteger(1, r), new BigInteger(1, s));
+
         ECKey ecKey = ECKey.recoverFromSignature(recoveryId, ecdsaSig, Sha256Hash.wrap(dataToVerify), false);
         return blockchainAddress(ecKey.getPubKey());
     }
@@ -165,7 +165,7 @@ public final class Crypto {
         String originalData = "Chainium";
         String expected = "CGwVR5Wyya4";
         String actual = ownSdk.Encode58(originalData.getBytes());
-        String decoded = new String(ownSdk.Decode58(actual));        
+        String decoded = new String(ownSdk.Decode58(actual));
         System.out.println(String.format("Expected = %s", expected));
         System.out.println(String.format("Actual = %s", actual));
         System.out.println(String.format("Decoded = %s", decoded));
@@ -187,7 +187,7 @@ public final class Crypto {
         System.out.println("==================== Signing (Address from PrivateKey) ====================");
         String privateKey = "3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq";
         expected = "CHGmdQdHfLPcMHtzyDzxAkTAQiRvKJrkYv8";
-        actual = ownSdk.AddressFromPrivateKey(privateKey);     
+        actual = ownSdk.AddressFromPrivateKey(privateKey);
         System.out.println(String.format("Expected = %s", expected));
         System.out.println(String.format("Actual = %s", actual));
 
@@ -203,7 +203,7 @@ public final class Crypto {
         expected = "EzCsWgPozyVT9o6TycYV6q1n4YK4QWixa6Lk4GFvwrj6RU3K1wHcwNPZJUMBYcsGp5oFhytHiThon5zqE8uLk8naB";
         actual = ownSdk.SignPlainText(privateKey, message);
         System.out.println(String.format("Expected = %s", expected));
-        System.out.println(String.format("Actual = %s", actual));    
+        System.out.println(String.format("Actual = %s", actual));
 
         System.out.println("==================== Signing (VerifyPlainText) ====================");
         WalletInfo wallet = ownSdk.GenerateWallet();
@@ -212,5 +212,6 @@ public final class Crypto {
         actual = ownSdk.VerifyPlainTextSignature(signature, message);
         System.out.println(String.format("Expected = %s", expected));
         System.out.println(String.format("Actual = %s", actual));
+
     }
 }
