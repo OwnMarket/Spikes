@@ -2,6 +2,9 @@ package ownSdk;
 
 import java.util.ArrayList;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class Tx {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,4 +160,19 @@ public class Tx {
         Dtos.RemoveKycProviderTxActionDto dto = new Dtos.RemoveKycProviderTxActionDto(assetHash, providerAddress);
         addAction("RemoveKycProvider", dto);
     }
+
+    public String toJson(boolean indentation) {
+        Gson gson = 
+            indentation 
+            ? new GsonBuilder().setPrettyPrinting().create()
+            : new Gson();
+        return gson.toJson(this);        
+    }
+
+    public Dtos.SignedTx sign(String networkCode, String privateKey) {
+        String json = toJson(false);
+        String signature = Crypto.signMessage(networkCode, privateKey, json);
+        return new Dtos.SignedTx(Crypto.encode64(json.getBytes()), signature);
+    }    
 }
+
