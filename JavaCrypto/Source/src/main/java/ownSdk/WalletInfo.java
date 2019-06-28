@@ -1,14 +1,30 @@
 package ownSdk;
 
-public class WalletInfo 
+public final class WalletInfo 
 {
-    public static WalletInfo Create(String privateKey, String address) {
+    public static WalletInfo create(String privateKey, String address) {
         WalletInfo wallet = new WalletInfo();
-        wallet.PrivateKey = privateKey;
-        wallet.Address = address;
+        wallet.setPrivateKey(privateKey);
+        wallet.setAddress(address);
         return wallet;
     }
     
-    public String PrivateKey;
-    public String Address;
+    private String privateKey;
+    private String address;
+
+    public String getPrivateKey() {
+        return this.privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    public String getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(String address){
+        this.address = address;
+    }
 }
