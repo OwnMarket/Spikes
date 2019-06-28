@@ -101,9 +101,10 @@ public class Tx {
         addAction("CreateAssetEmission", dto);
     }
 
-    public void addCreateAssetAction() {
+    public String addCreateAssetAction() {
         Dtos.CreateAssetTxActionDto dto = new Dtos.CreateAssetTxActionDto();
         addAction("CreateAsset", dto);
+        return Crypto.deriveHash(this.senderAddress, this.nonce, (short)this.actions.size());
     }
 
     public void addSetAssetCodeAction(String assetHash, String assetCode) {
@@ -116,9 +117,10 @@ public class Tx {
         addAction("SetAssetController", dto);
     }
 
-    public void addCreateAccountAction() {
+    public String addCreateAccountAction() {
         Dtos.CreateAccountTxActionDto dto = new Dtos.CreateAccountTxActionDto();
         addAction("CreateAccount", dto);
+        return Crypto.deriveHash(this.senderAddress, this.nonce, (short)this.actions.size());
     }
 
     public void addSetAccountControllerAction(String accountHash, String controllerAddress) {
