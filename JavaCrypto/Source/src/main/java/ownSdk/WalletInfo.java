@@ -16,7 +16,7 @@ public final class WalletInfo
         return this.privateKey;
     }
 
-    public void setPrivateKey(String privateKey) {
+    private void setPrivateKey(String privateKey) {
         this.privateKey = privateKey;
     }
 
@@ -24,7 +24,7 @@ public final class WalletInfo
         return this.address;
     }
 
-    public void setAddress(String address){
+    private void setAddress(String address){
         this.address = address;
     }
 }
