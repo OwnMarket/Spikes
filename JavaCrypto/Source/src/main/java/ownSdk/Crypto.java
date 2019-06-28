@@ -51,15 +51,15 @@ public final class Crypto {
         }
     }
 
-    public static byte[] sha256(byte[] data) {
+    private static byte[] sha256(byte[] data) {
         return hash(data, "SHA-256");
     }
 
-    public static byte[] sha512(byte[] data) {
+    private static byte[] sha512(byte[] data) {
         return hash(data, "SHA-512");
     }
 
-    public static byte[] sha160(byte[] data) {
+    private static byte[] sha160(byte[] data) {
         byte[] sha512 = sha512(data);
         return Arrays.copyOfRange(sha512, 0, 20);
     }
