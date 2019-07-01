@@ -202,6 +202,124 @@ public class TxTest {
 
     @Test
     public void testAddCreateAssetEmissionAction() {
+        Wallet senderWallet = new Wallet();
+        String emissionAccountHash = "EAccH1";
+        String assetHash = "AssetH1";   
+        float amount = 10000; 
 
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"CreateAssetEmission\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"emissionAccountHash\": \"%s\",\n", emissionAccountHash));
+        sb.append(String.format("        \"assetHash\": \"%s\",\n", assetHash));
+        sb.append(String.format("        \"amount\": %5.1f\n", amount));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addCreateAssetEmissionAction(emissionAccountHash, assetHash, amount);
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }
+
+    @Test
+    public void testAddCreateAssetAction() {
+        Wallet senderWallet = new Wallet();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"CreateAsset\",\n");
+        sb.append("      \"actionData\": {}\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addCreateAssetAction();
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }    
+
+    @Test
+    public void testAddCreateAssetActionReturnsAssetHash() {
+        Wallet senderWallet = new Wallet();
+        long nonce = 1;
+        String expected = Crypto.deriveHash(senderWallet.getAddress(), nonce, (short)1);
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        String actual = tx.addCreateAssetAction();
+        assertEquals(expected, actual);  
+    }
+
+    @Test
+    public void testAddSetAssetCodeAction() {
+        Wallet senderWallet = new Wallet();        
+        String assetHash = "AssetH1";   
+        String assetCode = "AST1";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"SetAssetCode\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"assetHash\": \"%s\",\n", assetHash));
+        sb.append(String.format("        \"assetCode\": \"%s\"\n", assetCode));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addSetAssetCodeAction(assetHash, assetCode);
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }    
+
+    @Test
+    public void testAddSetAssetControllerAction() {
+        Wallet senderWallet = new Wallet();
+        Wallet controllerWallet = new Wallet();
+        String assetHash = "AssetH1";   
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"SetAssetController\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"assetHash\": \"%s\",\n", assetHash));
+        sb.append(String.format("        \"controllerAddress\": \"%s\"\n", controllerWallet.getAddress()));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addSetAssetControllerAction(assetHash, controllerWallet.getAddress());
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
     }
 }

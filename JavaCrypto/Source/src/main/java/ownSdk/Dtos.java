@@ -241,16 +241,9 @@ public class Dtos {
             setAssetHash(assetHash);
             setAssetCode(assetCode);
         }
-        private String assetCode;        
         private String assetHash;
-
-        public String getAssetCode() {
-            return this.assetCode;
-        }
-
-        private void setAssetCode(String assetCode) {
-            this.assetCode = assetCode;
-        }
+        private String assetCode;        
+        
 
         public String getAssetHash() {
             return this.assetHash;
@@ -259,6 +252,14 @@ public class Dtos {
         private void setAssetHash(String assetHash) {
             this.assetHash = assetHash;
         }    
+
+        public String getAssetCode() {
+            return this.assetCode;
+        }
+
+        private void setAssetCode(String assetCode) {
+            this.assetCode = assetCode;
+        }
     }
 
     public static class SetAssetControllerTxActionDto {
