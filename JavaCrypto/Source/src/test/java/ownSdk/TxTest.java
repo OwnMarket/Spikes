@@ -590,4 +590,47 @@ public class TxTest {
         String actual = tx.toJson(true);
         assertEquals(expected, actual);  
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Actions: Multiple
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    public void testAddTransferChxActionMultiple() {
+        Wallet senderWallet = new Wallet();
+        Wallet recipientWallet1 = new Wallet();
+        Wallet recipientWallet2 = new Wallet();
+        float amount1 = 200;
+        float amount2 = 300;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"TransferChx\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"recipientAddress\": \"%s\",\n", recipientWallet1.getAddress()));
+        sb.append(String.format("        \"amount\": %4.1f\n", amount1));
+        sb.append("      }\n");
+        sb.append("    },\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"TransferChx\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"recipientAddress\": \"%s\",\n", recipientWallet2.getAddress()));
+        sb.append(String.format("        \"amount\": %4.1f\n", amount2));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addTransferChxAction(recipientWallet1.getAddress(), amount1);
+        tx.addTransferChxAction(recipientWallet2.getAddress(), amount2);
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }
 }
