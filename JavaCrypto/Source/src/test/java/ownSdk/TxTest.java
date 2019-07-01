@@ -365,4 +365,74 @@ public class TxTest {
         String actual = tx.toJson(true);
         assertEquals(expected, actual);  
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Actions: Voting
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Test
+    public void testAddSubmitVoteAction() {
+        Wallet senderWallet = new Wallet();
+        String accountHash = "AccountH1";
+        String assetHash = "AssetH1";
+        String resolutionHash = "ResolutionH1";
+        String voteHash = "VoteH1";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"SubmitVote\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"accountHash\": \"%s\",\n", accountHash));
+        sb.append(String.format("        \"assetHash\": \"%s\",\n", assetHash));
+        sb.append(String.format("        \"resolutionHash\": \"%s\",\n", resolutionHash));
+        sb.append(String.format("        \"voteHash\": \"%s\"\n", voteHash));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addSubmitVoteAction(accountHash, assetHash, resolutionHash, voteHash);
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }
+
+    @Test
+    public void testAddSubmitVoteWeightAction() {
+        Wallet senderWallet = new Wallet();
+        String accountHash = "AccountH1";
+        String assetHash = "AssetH1";
+        String resolutionHash = "ResolutionH1";
+        float voteWeight = 12345;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"SubmitVoteWeight\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"accountHash\": \"%s\",\n", accountHash));
+        sb.append(String.format("        \"assetHash\": \"%s\",\n", assetHash));
+        sb.append(String.format("        \"resolutionHash\": \"%s\",\n", resolutionHash));
+        sb.append(String.format("        \"voteWeight\": %5.1f\n", voteWeight));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addSubmitVoteWeightAction(accountHash, assetHash, resolutionHash, voteWeight);
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }    
 }
