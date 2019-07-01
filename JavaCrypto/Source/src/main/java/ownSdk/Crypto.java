@@ -157,65 +157,6 @@ public final class Crypto {
     }
 
     public static void main(String[] args) {
-        System.out.println("==================== Encoding (Base58) ====================");
-        String originalData = "Chainium";
-        String expected = "CGwVR5Wyya4";
-        String actual = Crypto.encode58(originalData.getBytes());
-        String decoded = new String(Crypto.decode58(actual));
-        System.out.println(String.format("Expected = %s", expected));
-        System.out.println(String.format("Actual = %s", actual));
-        System.out.println(String.format("Decoded = %s", decoded));
-
-        System.out.println("==================== Encoding (Base64) ====================");
-        originalData = "Chainium";
-        expected = "Q2hhaW5pdW0=";
-        actual = Crypto.encode64(originalData.getBytes());
-        decoded = new String(Crypto.decode64(actual));
-        System.out.println(String.format("Expected = %s", expected));
-        System.out.println(String.format("Actual = %s", actual));
-        System.out.println(String.format("Decoded = %s", decoded));        
-
-        System.out.println("==================== Hashing ====================");
-        expected = "Dp6vNLdUbRTc1Y3i9uSBritNqvqe4es9MjjGrVi1nQMu";
-        actual = Crypto.hash(originalData.getBytes());
-        System.out.println(String.format("Expected = %s", expected));
-        System.out.println(String.format("Actual = %s", actual));
-
-        String address = "CHPJ6aVwpGBRf1dv6Ey1TuhJzt1VtCP5LYB";
-        long nonce = 32;
-        short txActionNumber = 2;
-        expected = "5kHcMrwXUptjmbdR8XBW2yY3FkSFwnMdrVr22Yg39pTR";
-        actual = Crypto.deriveHash(address, nonce, txActionNumber);
-        System.out.println(String.format("Expected = %s", expected));
-        System.out.println(String.format("Actual = %s", actual));
-
-        System.out.println("==================== Signing (Address from PrivateKey) ====================");
-        String privateKey = "3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq";
-        expected = "CHGmdQdHfLPcMHtzyDzxAkTAQiRvKJrkYv8";
-        actual = Crypto.addressFromPrivateKey(privateKey);
-        System.out.println(String.format("Expected = %s", expected));
-        System.out.println(String.format("Actual = %s", actual));
-
-        System.out.println("==================== Signing (Tx) ====================");
-        String networkCode = "UNIT_TESTS";
-        String message = "Chainium";
-        expected = "EYzWMyZjqHkwsNFKcFEg4Q64m4jSUD7cAeKucyZ3a9MKeNmXTbRK3czqNVGj9RpkPGji9AtGiUxDtipqE3DtFPHxU";
-        actual = Crypto.signMessage(networkCode, privateKey, message);
-        System.out.println(String.format("Expected = %s", expected));
-        System.out.println(String.format("Actual = %s", actual));
-
-        System.out.println("==================== Signing (PlainText) ====================");
-        expected = "EzCsWgPozyVT9o6TycYV6q1n4YK4QWixa6Lk4GFvwrj6RU3K1wHcwNPZJUMBYcsGp5oFhytHiThon5zqE8uLk8naB";
-        actual = Crypto.signPlainText(privateKey, message);
-        System.out.println(String.format("Expected = %s", expected));
-        System.out.println(String.format("Actual = %s", actual));
-
-        System.out.println("==================== Signing (VerifyPlainText) ====================");
-        Wallet wallet = Crypto.generateWallet();
-        expected = Crypto.addressFromPrivateKey(wallet.getPrivateKey());
-        String signature = Crypto.signPlainText(wallet.getPrivateKey(), message);
-        actual = Crypto.verifyPlainTextSignature(signature, message);
-        System.out.println(String.format("Expected = %s", expected));
-        System.out.println(String.format("Actual = %s", actual));
+        System.out.println("Run mvn test");       
     }
 }
