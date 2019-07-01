@@ -435,4 +435,159 @@ public class TxTest {
         String actual = tx.toJson(true);
         assertEquals(expected, actual);  
     }    
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Actions: Eligibility
+    ////////////////////////////////////////////////////////////////////////////////////////////////////    
+
+    @Test
+    public void testAddSetAccountEligibilityAction() {
+        Wallet senderWallet = new Wallet();
+        String accountHash = "FAccH1";
+        String assetHash = "AssetH1";
+        boolean isPrimaryEligible = false;
+        boolean isSecondaryEligible = true;
+    
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"SetAccountEligibility\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"accountHash\": \"%s\",\n", accountHash));
+        sb.append(String.format("        \"assetHash\": \"%s\",\n", assetHash));
+        sb.append(String.format("        \"isPrimaryEligible\": %b,\n", isPrimaryEligible));
+        sb.append(String.format("        \"isSecondaryEligible\": %b\n", isSecondaryEligible));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addSetAccountEligibilityAction(accountHash, assetHash, isPrimaryEligible, isSecondaryEligible);
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }
+
+    @Test
+    public void testAddSetAssetEligibilityAction() {
+        Wallet senderWallet = new Wallet();
+        String assetHash = "AssetH1";
+        boolean isEligibilityRequired = true;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"SetAssetEligibility\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"assetHash\": \"%s\",\n", assetHash));
+        sb.append(String.format("        \"isEligibilityRequired\": %b\n", isEligibilityRequired));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addSetAssetEligibilityAction(assetHash, isEligibilityRequired);
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }
+
+    @Test
+    public void testAddChangeKycControllerAddressAction() {
+        Wallet senderWallet = new Wallet();
+        String accountHash = "FAccH1";
+        String assetHash = "AssetH1";
+        String kycControllerAddress = "KycCtrlAddr1";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"ChangeKycControllerAddress\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"accountHash\": \"%s\",\n", accountHash));
+        sb.append(String.format("        \"assetHash\": \"%s\",\n", assetHash));
+        sb.append(String.format("        \"kycControllerAddress\": \"%s\"\n", kycControllerAddress));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addChangeKycControllerAddressAction(accountHash, assetHash, kycControllerAddress);
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }    
+
+    @Test
+    public void testAddAddKycProviderAction() {
+        Wallet senderWallet = new Wallet();
+        String assetHash = "AssetH1";
+        String providerAddress = new Wallet().getAddress();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"AddKycProvider\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"assetHash\": \"%s\",\n", assetHash));
+        sb.append(String.format("        \"providerAddress\": \"%s\"\n", providerAddress));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addAddKycProviderAction(assetHash, providerAddress);
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }
+
+    @Test
+    public void testAddRemoveKycProviderAction() {
+        Wallet senderWallet = new Wallet();
+        String assetHash = "AssetH1";
+        String providerAddress = new Wallet().getAddress();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"RemoveKycProvider\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"assetHash\": \"%s\",\n", assetHash));
+        sb.append(String.format("        \"providerAddress\": \"%s\"\n", providerAddress));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addRemoveKycProviderAction(assetHash, providerAddress);
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }
 }
