@@ -322,4 +322,47 @@ public class TxTest {
         String actual = tx.toJson(true);
         assertEquals(expected, actual);  
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Actions: Account Management
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    @Test
+    public void testAddCreateAccountActionReturnsAccountHash() {
+        Wallet senderWallet = new Wallet();
+        long nonce = 1;
+        String expected = Crypto.deriveHash(senderWallet.getAddress(), nonce, (short)1);
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        String actual = tx.addCreateAccountAction();
+        assertEquals(expected, actual);  
+    }
+
+    @Test
+    public void testAddSetAccountControllerAction() {
+        Wallet senderWallet = new Wallet();
+        Wallet controllerWallet = new Wallet();
+        String accountHash = "AccountH1";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
+        sb.append("  \"nonce\": 1,\n");
+        sb.append("  \"expirationTime\": 0,\n");
+        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actions\": [\n");
+        sb.append("    {\n");
+        sb.append("      \"actionType\": \"SetAccountController\",\n");
+        sb.append("      \"actionData\": {\n");
+        sb.append(String.format("        \"accountHash\": \"%s\",\n", accountHash));
+        sb.append(String.format("        \"controllerAddress\": \"%s\"\n", controllerWallet.getAddress()));
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  ]\n");
+        sb.append("}");
+        String expected = sb.toString();
+        Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
+        tx.addSetAccountControllerAction(accountHash, controllerWallet.getAddress());
+        String actual = tx.toJson(true);
+        assertEquals(expected, actual);  
+    }
 }
