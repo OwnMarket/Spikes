@@ -157,7 +157,7 @@ public final class Crypto {
     }
 
     public static void main(String[] args) {
-        System.out.println("==================== Encoding ====================");
+        System.out.println("==================== Encoding (Base58) ====================");
         String originalData = "Chainium";
         String expected = "CGwVR5Wyya4";
         String actual = Crypto.encode58(originalData.getBytes());
@@ -165,6 +165,15 @@ public final class Crypto {
         System.out.println(String.format("Expected = %s", expected));
         System.out.println(String.format("Actual = %s", actual));
         System.out.println(String.format("Decoded = %s", decoded));
+
+        System.out.println("==================== Encoding (Base64) ====================");
+        originalData = "Chainium";
+        expected = "Q2hhaW5pdW0=";
+        actual = Crypto.encode64(originalData.getBytes());
+        decoded = new String(Crypto.decode64(actual));
+        System.out.println(String.format("Expected = %s", expected));
+        System.out.println(String.format("Actual = %s", actual));
+        System.out.println(String.format("Decoded = %s", decoded));        
 
         System.out.println("==================== Hashing ====================");
         expected = "Dp6vNLdUbRTc1Y3i9uSBritNqvqe4es9MjjGrVi1nQMu";
