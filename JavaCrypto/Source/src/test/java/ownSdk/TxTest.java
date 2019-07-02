@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class TxTest {
-    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // TX
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 123,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": []\n");
         sb.append("}");
         String expected = sb.toString();
@@ -35,19 +35,18 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": []\n");
         sb.append("}");
         String expected = sb.toString();
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);        
+        assertEquals(expected, actual);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // Actions: Network Management
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
     @Test
     public void testAddTransferChxAction() {
@@ -60,7 +59,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"TransferChx\",\n");
@@ -75,7 +74,7 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addTransferChxAction(recipientWallet.getAddress(), amount);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -89,7 +88,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"DelegateStake\",\n");
@@ -104,7 +103,7 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addDelegateStakeAction(validatorWallet.getAddress(), amount);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -112,14 +111,14 @@ public class TxTest {
         Wallet senderWallet = new Wallet();
         String networkAddress = "val01.some.domain.com:25718";
         float sharedRewardPercent = 100000;
-        boolean isEnabled = true;        
+        boolean isEnabled = true;
 
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"ConfigureValidator\",\n");
@@ -135,19 +134,19 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addConfigureValidatorAction(networkAddress, sharedRewardPercent, isEnabled);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     @Test
     public void testAddRemoveValidatorAction() {
-        Wallet senderWallet = new Wallet(); 
+        Wallet senderWallet = new Wallet();
 
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"RemoveValidator\",\n");
@@ -159,13 +158,12 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addRemoveValidatorAction();
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // Actions: Asset Management
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
     @Test
     public void testAddTransferAssetAction() {
@@ -180,7 +178,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"TransferAsset\",\n");
@@ -197,22 +195,22 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addTransferAssetAction(fromAccountHash, toAccountHash, assetHash, amount);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     @Test
     public void testAddCreateAssetEmissionAction() {
         Wallet senderWallet = new Wallet();
         String emissionAccountHash = "EAccH1";
-        String assetHash = "AssetH1";   
-        float amount = 10000; 
+        String assetHash = "AssetH1";
+        float amount = 10000;
 
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"CreateAssetEmission\",\n");
@@ -228,7 +226,7 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addCreateAssetEmissionAction(emissionAccountHash, assetHash, amount);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -240,7 +238,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"CreateAsset\",\n");
@@ -252,23 +250,23 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addCreateAssetAction();
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
-    }    
+        assertEquals(expected, actual);
+    }
 
     @Test
     public void testAddCreateAssetActionReturnsAssetHash() {
         Wallet senderWallet = new Wallet();
         long nonce = 1;
-        String expected = Crypto.deriveHash(senderWallet.getAddress(), nonce, (short)1);
+        String expected = Crypto.deriveHash(senderWallet.getAddress(), nonce, (short) 1);
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         String actual = tx.addCreateAssetAction();
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     @Test
     public void testAddSetAssetCodeAction() {
-        Wallet senderWallet = new Wallet();        
-        String assetHash = "AssetH1";   
+        Wallet senderWallet = new Wallet();
+        String assetHash = "AssetH1";
         String assetCode = "AST1";
 
         StringBuilder sb = new StringBuilder();
@@ -276,7 +274,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"SetAssetCode\",\n");
@@ -291,21 +289,21 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addSetAssetCodeAction(assetHash, assetCode);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
-    }    
+        assertEquals(expected, actual);
+    }
 
     @Test
     public void testAddSetAssetControllerAction() {
         Wallet senderWallet = new Wallet();
         Wallet controllerWallet = new Wallet();
-        String assetHash = "AssetH1";   
+        String assetHash = "AssetH1";
 
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"SetAssetController\",\n");
@@ -320,21 +318,21 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addSetAssetControllerAction(assetHash, controllerWallet.getAddress());
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // Actions: Account Management
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     @Test
     public void testAddCreateAccountActionReturnsAccountHash() {
         Wallet senderWallet = new Wallet();
         long nonce = 1;
-        String expected = Crypto.deriveHash(senderWallet.getAddress(), nonce, (short)1);
+        String expected = Crypto.deriveHash(senderWallet.getAddress(), nonce, (short) 1);
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         String actual = tx.addCreateAccountAction();
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -348,7 +346,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"SetAccountController\",\n");
@@ -363,7 +361,7 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addSetAccountControllerAction(accountHash, controllerWallet.getAddress());
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -383,7 +381,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"SubmitVote\",\n");
@@ -400,7 +398,7 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addSubmitVoteAction(accountHash, assetHash, resolutionHash, voteHash);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -416,7 +414,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"SubmitVoteWeight\",\n");
@@ -433,12 +431,12 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addSubmitVoteWeightAction(accountHash, assetHash, resolutionHash, voteWeight);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
-    }    
+        assertEquals(expected, actual);
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // Actions: Eligibility
-    ////////////////////////////////////////////////////////////////////////////////////////////////////    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
     public void testAddSetAccountEligibilityAction() {
@@ -447,13 +445,13 @@ public class TxTest {
         String assetHash = "AssetH1";
         boolean isPrimaryEligible = false;
         boolean isSecondaryEligible = true;
-    
+
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"SetAccountEligibility\",\n");
@@ -470,7 +468,7 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addSetAccountEligibilityAction(accountHash, assetHash, isPrimaryEligible, isSecondaryEligible);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -484,7 +482,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"SetAssetEligibility\",\n");
@@ -499,7 +497,7 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addSetAssetEligibilityAction(assetHash, isEligibilityRequired);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -514,7 +512,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"ChangeKycControllerAddress\",\n");
@@ -530,8 +528,8 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addChangeKycControllerAddressAction(accountHash, assetHash, kycControllerAddress);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
-    }    
+        assertEquals(expected, actual);
+    }
 
     @Test
     public void testAddAddKycProviderAction() {
@@ -544,7 +542,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"AddKycProvider\",\n");
@@ -559,7 +557,7 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addAddKycProviderAction(assetHash, providerAddress);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -573,7 +571,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"RemoveKycProvider\",\n");
@@ -588,7 +586,7 @@ public class TxTest {
         Tx tx = new Tx(senderWallet.getAddress(), 1, 0.01f, 0);
         tx.addRemoveKycProviderAction(assetHash, providerAddress);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -608,7 +606,7 @@ public class TxTest {
         sb.append(String.format("  \"senderAddress\": \"%s\",\n", senderWallet.getAddress()));
         sb.append("  \"nonce\": 1,\n");
         sb.append("  \"expirationTime\": 0,\n");
-        sb.append("  \"actionFee\": 0.01,\n");        
+        sb.append("  \"actionFee\": 0.01,\n");
         sb.append("  \"actions\": [\n");
         sb.append("    {\n");
         sb.append("      \"actionType\": \"TransferChx\",\n");
@@ -631,6 +629,6 @@ public class TxTest {
         tx.addTransferChxAction(recipientWallet1.getAddress(), amount1);
         tx.addTransferChxAction(recipientWallet2.getAddress(), amount2);
         String actual = tx.toJson(true);
-        assertEquals(expected, actual);  
+        assertEquals(expected, actual);
     }
 }

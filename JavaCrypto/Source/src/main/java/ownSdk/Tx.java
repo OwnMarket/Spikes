@@ -173,11 +173,8 @@ public class Tx {
         addAction("RemoveKycProvider", dto);
     }
 
-    public String toJson(boolean indentation) {        
-        Gson gson = 
-            indentation 
-            ? new GsonBuilder().setPrettyPrinting().create()
-            : new Gson();
+    public String toJson(boolean indentation) {
+        Gson gson = indentation ? new GsonBuilder().setPrettyPrinting().create() : new Gson();
         return gson.toJson(this);
     }
 
@@ -185,6 +182,5 @@ public class Tx {
         String json = toJson(false);
         String signature = Crypto.signMessage(networkCode, privateKey, json);
         return new Dtos.SignedTx(Crypto.encode64(json.getBytes()), signature);
-    }    
+    }
 }
-

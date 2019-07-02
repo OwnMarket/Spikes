@@ -1,6 +1,7 @@
 package ownSdk;
 
 public final class Wallet {
+
     public Wallet() {
         Wallet wallet = Crypto.generateWallet();
         setWallet(wallet);
@@ -36,7 +37,7 @@ public final class Wallet {
         return this.address;
     }
 
-    private void setAddress(String address){
+    private void setAddress(String address) {
         this.address = address;
     }
 }
