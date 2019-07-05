@@ -36,13 +36,13 @@ def sha160(data):
 def hash(data):
     return encode58(sha256(data))
 
-def deriveHash(address, nonce, txActionNumber):
+def derive_hash(address, nonce, txActionNumber):
     addressB = decode58(address)
     nonceB = nonce.to_bytes(8, byteorder='big')
     txActionNumberB = txActionNumber.to_bytes(2, byteorder='big')
     return hash(addressB + nonceB + txActionNumberB)
 
-def blockchainAddress(publicKey):
+def blockchain_address(publicKey):
     prefix = bytes(bytearray.fromhex('065A'))
     publicKeyHashWithPrefix = prefix + sha160(sha256(publicKey))
     checksum = sha256(sha256(publicKeyHashWithPrefix))[:4]
@@ -55,25 +55,29 @@ def blockchainAddress(publicKey):
 def decompress(pk):
      return bytes(chr(4), 'ascii') + pk.to_string()
      
-def generateWallet(): 
+def generate_wallet(): 
     sk = SigningKey.generate(curve=SECP256k1)
     pk = sk.get_verifying_key()
     privateKey = encode58(sk.to_string())
     publicKey = bytes(chr(4), 'ascii') + pk.to_string()
-    address = blockchainAddress(decompress(pk))
+    address = blockchain_address(decompress(pk))
     return (privateKey, address)    
     
-def addressFromPrivateKey(privateKey):      
+def address_from_private_key(privateKey):      
     privateKeyB = decode58(privateKey)
     sk = SigningKey.from_string(privateKeyB, curve=SECP256k1)
     pk = sk.get_verifying_key()
-    return blockchainAddress(decompress(pk))
+    return blockchain_address(decompress(pk))
+
+def wallet_from_private_key(privateKey):
+    address = address_from_private_key(privateKey)
+    return (privateKey, address)
 
 ####################################################################################################
 ## Testing
 ####################################################################################################
 
-def testEncodeDecodeBase64():
+def test_encode_decode_base64():
     originalData = 'Chainium'
     expected = 'Q2hhaW5pdW0='
     actual = encode64(originalData.encode())
@@ -81,7 +85,7 @@ def testEncodeDecodeBase64():
     print('Expected = ', expected, ' | Actual = ', actual)
     print('Original = ', originalData, ' | Decoded = ', decoded)
 
-def testEncodeDecodeBase58():
+def test_encode_decode_base58():
     originalData = 'Chainium'
     expected = 'CGwVR5Wyya4'
     actual = encode58(originalData.encode())
@@ -89,36 +93,35 @@ def testEncodeDecodeBase58():
     print('Expected = ', expected, ' | Actual = ', actual)
     print('Original = ', originalData, ' | Decoded = ', decoded)
 
-def testHash(): 
+def test_hash(): 
     originalData = 'Chainium'
     expected = 'Dp6vNLdUbRTc1Y3i9uSBritNqvqe4es9MjjGrVi1nQMu'
     actual = hash(originalData.encode())
     print('Expected = ', expected, ' | Actual = ', actual)
 
-def testDeriveHash():
+def test_derive_hash():
     address = 'CHPJ6aVwpGBRf1dv6Ey1TuhJzt1VtCP5LYB'
     nonce = 32
     txActionNumber = 2
     expected = '5kHcMrwXUptjmbdR8XBW2yY3FkSFwnMdrVr22Yg39pTR'
-    actual = deriveHash(address, nonce, txActionNumber)
+    actual = derive_hash(address, nonce, txActionNumber)
     print('Expected = ', expected, ' | Actual = ', actual)
 
-def testGenerateWallet():
-    privateKey, address = generateWallet()
+def test_generate_wallet():
+    privateKey, address = generate_wallet()
     expected = address   
-    actual = addressFromPrivateKey(privateKey)
+    actual = address_from_private_key(privateKey)
     print('Expected = ', expected, ' | Actual = ', actual)    
     
-def testAddressFromPrivateKey():
+def test_address_from_private_key():
     privateKey = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
     expected = 'CHGmdQdHfLPcMHtzyDzxAkTAQiRvKJrkYv8'
-    actual = addressFromPrivateKey(privateKey)
+    actual = address_from_private_key(privateKey)
     print('Expected = ', expected, ' | Actual = ', actual)    
         
-testEncodeDecodeBase64()
-testEncodeDecodeBase58()
-testHash()
-testDeriveHash()
-testGenerateWallet()
-testAddressFromPrivateKey()
-
+test_encode_decode_base64()
+test_encode_decode_base58()
+test_hash()
+test_derive_hash()
+test_generate_wallet()
+test_address_from_private_key()
