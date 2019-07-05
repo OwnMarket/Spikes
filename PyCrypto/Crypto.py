@@ -36,17 +36,17 @@ def sha160(data):
 def hash(data):
     return encode58(sha256(data))
 
-def derive_hash(address, nonce, txActionNumber):
-    addressB = decode58(address)
+def derive_hash(address, nonce, tx_action_number):
+    address_bytes = decode58(address)
     nonceB = nonce.to_bytes(8, byteorder='big')
-    txActionNumberB = txActionNumber.to_bytes(2, byteorder='big')
-    return hash(addressB + nonceB + txActionNumberB)
+    tx_action_number_bytes = tx_action_number.to_bytes(2, byteorder='big')
+    return hash(address_bytes + nonceB + tx_action_number_bytes)
 
-def blockchain_address(publicKey):
+def blockchain_address(public_key):
     prefix = bytes(bytearray.fromhex('065A'))
-    publicKeyHashWithPrefix = prefix + sha160(sha256(publicKey))
-    checksum = sha256(sha256(publicKeyHashWithPrefix))[:4]
-    return encode58(publicKeyHashWithPrefix + checksum)
+    public_key_hash_with_prefix = prefix + sha160(sha256(public_key))
+    checksum = sha256(sha256(public_key_hash_with_prefix))[:4]
+    return encode58(public_key_hash_with_prefix + checksum)
 
 ####################################################################################################
 ## Signing
@@ -58,65 +58,81 @@ def decompress(pk):
 def generate_wallet(): 
     sk = SigningKey.generate(curve=SECP256k1)
     pk = sk.get_verifying_key()
-    privateKey = encode58(sk.to_string())
-    publicKey = bytes(chr(4), 'ascii') + pk.to_string()
+    private_key = encode58(sk.to_string())
+    public_key = bytes(chr(4), 'ascii') + pk.to_string()
     address = blockchain_address(decompress(pk))
-    return (privateKey, address)    
+    return (private_key, address)    
     
-def address_from_private_key(privateKey):      
-    privateKeyB = decode58(privateKey)
-    sk = SigningKey.from_string(privateKeyB, curve=SECP256k1)
+def address_from_private_key(private_key):      
+    private_key_bytes = decode58(private_key)
+    sk = SigningKey.from_string(private_key_bytes, curve=SECP256k1)
     pk = sk.get_verifying_key()
     return blockchain_address(decompress(pk))
 
-def wallet_from_private_key(privateKey):
-    address = address_from_private_key(privateKey)
-    return (privateKey, address)
+def wallet_from_private_key(private_key):
+    address = address_from_private_key(private_key)
+    return (private_key, address)
 
+def sign(private_key, data_hash):
+    private_key_bytes = decode58(private_key)
+    sk = SigningKey.from_string(private_key_bytes, curve=SECP256k1)
+    signature_bytes = sk.sign(data_hash)
+    return encode58(signature_bytes)
+
+def sign_message(network_code, private_key, message):
+    message_hash = sha256(message)
+    network_id_bytes = sha256(network_code)
+    data_hash = sha256(message_hash + network_id_bytes)
+    return sign(private_key, data_hash)
+    
+def sign_plain_text(private_key, text): 
+    data_hash = sha256(text)
+    return sign(private_key, data_hash)
+        
 ####################################################################################################
 ## Testing
 ####################################################################################################
 
 def test_encode_decode_base64():
-    originalData = 'Chainium'
+    original_data = 'Chainium'
     expected = 'Q2hhaW5pdW0='
-    actual = encode64(originalData.encode())
+    actual = encode64(original_data.encode())
     decoded = decode64(actual).decode()
     print('Expected = ', expected, ' | Actual = ', actual)
-    print('Original = ', originalData, ' | Decoded = ', decoded)
+    print('Original = ', original_data, ' | Decoded = ', decoded)
 
 def test_encode_decode_base58():
-    originalData = 'Chainium'
+    original_data = 'Chainium'
     expected = 'CGwVR5Wyya4'
-    actual = encode58(originalData.encode())
+    actual = encode58(original_data.encode())
     decoded = decode58(actual).decode()
     print('Expected = ', expected, ' | Actual = ', actual)
-    print('Original = ', originalData, ' | Decoded = ', decoded)
+    print('Original = ', original_data, ' | Decoded = ', decoded)
 
 def test_hash(): 
-    originalData = 'Chainium'
+    original_data = 'Chainium'
     expected = 'Dp6vNLdUbRTc1Y3i9uSBritNqvqe4es9MjjGrVi1nQMu'
-    actual = hash(originalData.encode())
+    actual = hash(original_data.encode())
     print('Expected = ', expected, ' | Actual = ', actual)
 
 def test_derive_hash():
     address = 'CHPJ6aVwpGBRf1dv6Ey1TuhJzt1VtCP5LYB'
     nonce = 32
-    txActionNumber = 2
+    tx_action_number = 2
     expected = '5kHcMrwXUptjmbdR8XBW2yY3FkSFwnMdrVr22Yg39pTR'
-    actual = derive_hash(address, nonce, txActionNumber)
+    actual = derive_hash(address, nonce, tx_action_number)
     print('Expected = ', expected, ' | Actual = ', actual)
 
 def test_generate_wallet():
-    privateKey, address = generate_wallet()
+    private_key, address = generate_wallet()
     expected = address   
-    actual = address_from_private_key(privateKey)
+    actual = address_from_private_key(private_key)
     print('Expected = ', expected, ' | Actual = ', actual)    
     
 def test_address_from_private_key():
-    privateKey = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
+    private_key = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
     expected = 'CHGmdQdHfLPcMHtzyDzxAkTAQiRvKJrkYv8'
-    actual = address_from_private_key(privateKey)
+    actual = address_from_private_key(private_key)
     print('Expected = ', expected, ' | Actual = ', actual)    
         
 test_encode_decode_base64()
