@@ -3,6 +3,7 @@ import base64
 import hashlib
 import struct
 from ecdsa import SigningKey, SECP256k1
+import coincurve
 
 ####################################################################################################
 ## Encoding
@@ -38,9 +39,9 @@ def hash(data):
 
 def derive_hash(address, nonce, tx_action_number):
     address_bytes = decode58(address)
-    nonceB = nonce.to_bytes(8, byteorder='big')
+    nonce_bytes = nonce.to_bytes(8, byteorder='big')
     tx_action_number_bytes = tx_action_number.to_bytes(2, byteorder='big')
-    return hash(address_bytes + nonceB + tx_action_number_bytes)
+    return hash(address_bytes + nonce_bytes + tx_action_number_bytes)
 
 def blockchain_address(public_key):
     prefix = bytes(bytearray.fromhex('065A'))
@@ -59,7 +60,6 @@ def generate_wallet():
     sk = SigningKey.generate(curve=SECP256k1)
     pk = sk.get_verifying_key()
     private_key = encode58(sk.to_string())
-    public_key = bytes(chr(4), 'ascii') + pk.to_string()
     address = blockchain_address(decompress(pk))
     return (private_key, address)    
     
@@ -75,13 +75,13 @@ def wallet_from_private_key(private_key):
 
 def sign(private_key, data_hash):
     private_key_bytes = decode58(private_key)
-    sk = SigningKey.from_string(private_key_bytes, curve=SECP256k1)
-    signature_bytes = sk.sign(data_hash)
+    sk = coincurve.PrivateKey(private_key_bytes)
+    signature_bytes = sk.sign_recoverable(data_hash, None)        
     return encode58(signature_bytes)
 
 def sign_message(network_code, private_key, message):
     message_hash = sha256(message)
-    network_id_bytes = sha256(network_code)
+    network_id_bytes = sha256(network_code.encode())
     data_hash = sha256(message_hash + network_id_bytes)
     return sign(private_key, data_hash)
     
@@ -134,10 +134,29 @@ def test_address_from_private_key():
     expected = 'CHGmdQdHfLPcMHtzyDzxAkTAQiRvKJrkYv8'
     actual = address_from_private_key(private_key)
     print('Expected = ', expected, ' | Actual = ', actual)    
+    
+def test_sign_message():
+    networkCode = 'UNIT_TESTS'
+    privateKey = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
+    tx = 'Chainium'
+    expected = 'EYzWMyZjqHkwsNFKcFEg4Q64m4jSUD7cAeKucyZ3a9MKeNmXTbRK3czqNVGj9RpkPGji9AtGiUxDtipqE3DtFPHxU'
+    actual = sign_message(networkCode, privateKey, tx.encode())
+    print('Expected = ', expected)    
+    print('Actual =   ', actual)
+    
+def test_sign_plain_text():
+    privateKey = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
+    txt = 'Chainium'
+    expected = 'EzCsWgPozyVT9o6TycYV6q1n4YK4QWixa6Lk4GFvwrj6RU3K1wHcwNPZJUMBYcsGp5oFhytHiThon5zqE8uLk8naB'
+    actual = sign_plain_text(privateKey, txt.encode())
+    print('Expected = ', expected)    
+    print('Actual =   ', actual)
         
-test_encode_decode_base64()
-test_encode_decode_base58()
-test_hash()
-test_derive_hash()
-test_generate_wallet()
-test_address_from_private_key()
+# test_encode_decode_base64()
+# test_encode_decode_base58()
+# test_hash()
+# test_derive_hash()
+# test_generate_wallet()
+# test_address_from_private_key()
+test_sign_message()
+test_sign_plain_text()
