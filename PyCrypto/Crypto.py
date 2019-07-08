@@ -88,6 +88,12 @@ def sign_message(network_code, private_key, message):
 def sign_plain_text(private_key, text): 
     data_hash = sha256(text)
     return sign(private_key, data_hash)
+
+def verify_plain_text_signature(signature, text):
+    data_hash = sha256(text)
+    signature_bytes = decode58(signature)
+    pk = coincurve.PublicKey.from_signature_and_message(signature_bytes, data_hash, None)
+    return blockchain_address(pk.format(compressed=False))
         
 ####################################################################################################
 ## Testing
@@ -136,21 +142,30 @@ def test_address_from_private_key():
     print('Expected = ', expected, ' | Actual = ', actual)    
     
 def test_sign_message():
-    networkCode = 'UNIT_TESTS'
-    privateKey = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
+    network_code = 'UNIT_TESTS'
+    private_key = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
     tx = 'Chainium'
     expected = 'EYzWMyZjqHkwsNFKcFEg4Q64m4jSUD7cAeKucyZ3a9MKeNmXTbRK3czqNVGj9RpkPGji9AtGiUxDtipqE3DtFPHxU'
-    actual = sign_message(networkCode, privateKey, tx.encode())
+    actual = sign_message(network_code, private_key, tx.encode())
     print('Expected = ', expected)    
     print('Actual =   ', actual)
     
 def test_sign_plain_text():
-    privateKey = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
-    txt = 'Chainium'
+    private_key = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
+    text = 'Chainium'
     expected = 'EzCsWgPozyVT9o6TycYV6q1n4YK4QWixa6Lk4GFvwrj6RU3K1wHcwNPZJUMBYcsGp5oFhytHiThon5zqE8uLk8naB'
-    actual = sign_plain_text(privateKey, txt.encode())
+    actual = sign_plain_text(private_key, text.encode())
     print('Expected = ', expected)    
     print('Actual =   ', actual)
+    
+def test_verify_plain_text_signature():
+    private_key, address = generate_wallet()
+    expected = address_from_private_key(private_key)
+    text = 'Chainium'
+    signature = sign_plain_text(private_key, text.encode())
+    actual = verify_plain_text_signature(signature, text.encode())
+    print('Expected = ', expected, ' | Actual = ', actual)
+    
         
 # test_encode_decode_base64()
 # test_encode_decode_base58()
@@ -158,5 +173,6 @@ def test_sign_plain_text():
 # test_derive_hash()
 # test_generate_wallet()
 # test_address_from_private_key()
-test_sign_message()
-test_sign_plain_text()
+# test_sign_message()
+# test_sign_plain_text()
+test_verify_plain_text_signature()
