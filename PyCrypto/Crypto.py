@@ -148,7 +148,7 @@ def test_sign_message():
     expected = 'EYzWMyZjqHkwsNFKcFEg4Q64m4jSUD7cAeKucyZ3a9MKeNmXTbRK3czqNVGj9RpkPGji9AtGiUxDtipqE3DtFPHxU'
     actual = sign_message(network_code, private_key, tx.encode())
     print('Expected = ', expected)    
-    print('Actual =   ', actual)
+    print('Actual = ', actual)
     
 def test_sign_plain_text():
     private_key = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
@@ -156,7 +156,7 @@ def test_sign_plain_text():
     expected = 'EzCsWgPozyVT9o6TycYV6q1n4YK4QWixa6Lk4GFvwrj6RU3K1wHcwNPZJUMBYcsGp5oFhytHiThon5zqE8uLk8naB'
     actual = sign_plain_text(private_key, text.encode())
     print('Expected = ', expected)    
-    print('Actual =   ', actual)
+    print('Actual = ', actual)
     
 def test_verify_plain_text_signature():
     private_key, address = generate_wallet()
@@ -167,12 +167,12 @@ def test_verify_plain_text_signature():
     print('Expected = ', expected, ' | Actual = ', actual)
     
         
-# test_encode_decode_base64()
-# test_encode_decode_base58()
-# test_hash()
-# test_derive_hash()
-# test_generate_wallet()
-# test_address_from_private_key()
-# test_sign_message()
-# test_sign_plain_text()
+test_encode_decode_base64()
+test_encode_decode_base58()
+test_hash()
+test_derive_hash()
+test_generate_wallet()
+test_address_from_private_key()
+test_sign_message()
+test_sign_plain_text()
 test_verify_plain_text_signature()
