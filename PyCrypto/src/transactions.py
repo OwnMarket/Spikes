@@ -12,6 +12,10 @@ class Tx:
         self.action_fee = action_fee
         self.expiration_time = expiration_time    
      
+    ####################################################################################################
+    ## Actions
+    ####################################################################################################
+     
     @classmethod 
     def add_action(self, action_type, action_data):
         action = {'actionType': action_type, 'actionData': action_data}
@@ -145,4 +149,8 @@ class Tx:
         self.add_action('RemoveKycProvider', {
             'assetHash': asset_hash,
             'providerAddress': provider_address
-        })                
+        })
+
+    ####################################################################################################
+    ## Signing
+    ####################################################################################################
