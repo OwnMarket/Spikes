@@ -48,20 +48,20 @@ def test_sign_message():
     private_key = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
     tx = 'Chainium'
     expected = 'EYzWMyZjqHkwsNFKcFEg4Q64m4jSUD7cAeKucyZ3a9MKeNmXTbRK3czqNVGj9RpkPGji9AtGiUxDtipqE3DtFPHxU'
-    actual = crypto.sign_message(network_code, private_key, tx.encode())
+    actual = crypto.sign_message(network_code, private_key, tx)
     assert expected == actual
     
 def test_sign_plain_text():
     private_key = '3rzY3EENhYrWXzUqNnMEbGUr3iEzzSZrjMwJ1CgQpJpq'
     text = 'Chainium'
     expected = 'EzCsWgPozyVT9o6TycYV6q1n4YK4QWixa6Lk4GFvwrj6RU3K1wHcwNPZJUMBYcsGp5oFhytHiThon5zqE8uLk8naB'
-    actual = crypto.sign_plain_text(private_key, text.encode())
+    actual = crypto.sign_plain_text(private_key, text)
     assert expected == actual
     
 def test_verify_plain_text_signature():
     private_key, address = crypto.generate_wallet()
     expected = crypto.address_from_private_key(private_key)
     text = 'Chainium'
-    signature = crypto.sign_plain_text(private_key, text.encode())
-    actual = crypto.verify_plain_text_signature(signature, text.encode())
+    signature = crypto.sign_plain_text(private_key, text)
+    actual = crypto.verify_plain_text_signature(signature, text)
     assert expected == actual

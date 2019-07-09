@@ -80,17 +80,17 @@ def sign(private_key, data_hash):
     return encode58(signature_bytes)
 
 def sign_message(network_code, private_key, message):
-    message_hash = sha256(message)
+    message_hash = sha256(message.encode())
     network_id_bytes = sha256(network_code.encode())
     data_hash = sha256(message_hash + network_id_bytes)
     return sign(private_key, data_hash)
     
 def sign_plain_text(private_key, text): 
-    data_hash = sha256(text)
+    data_hash = sha256(text.encode())
     return sign(private_key, data_hash)
 
 def verify_plain_text_signature(signature, text):
-    data_hash = sha256(text)
+    data_hash = sha256(text.encode())
     signature_bytes = decode58(signature)
     pk = coincurve.PublicKey.from_signature_and_message(signature_bytes, data_hash, None)
     return blockchain_address(pk.format(compressed=False))
