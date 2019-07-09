@@ -166,13 +166,3 @@ def test_verify_plain_text_signature():
     actual = verify_plain_text_signature(signature, text.encode())
     print('Expected = ', expected, ' | Actual = ', actual)
     
-        
-test_encode_decode_base64()
-test_encode_decode_base58()
-test_hash()
-test_derive_hash()
-test_generate_wallet()
-test_address_from_private_key()
-test_sign_message()
-test_sign_plain_text()
-test_verify_plain_text_signature()
