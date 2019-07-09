@@ -95,6 +95,10 @@ def verify_plain_text_signature(signature, text):
     pk = coincurve.PublicKey.from_signature_and_message(signature_bytes, data_hash, None)
     return blockchain_address(pk.format(compressed=False))
 
+####################################################################################################
+## Wallet
+####################################################################################################
+
 class Wallet:
     private_key = None
     address = None
