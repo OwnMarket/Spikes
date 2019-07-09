@@ -94,3 +94,19 @@ def verify_plain_text_signature(signature, text):
     signature_bytes = decode58(signature)
     pk = coincurve.PublicKey.from_signature_and_message(signature_bytes, data_hash, None)
     return blockchain_address(pk.format(compressed=False))
+
+class Wallet:
+    private_key = None
+    address = None
+    
+    def __init__(self, private_key=None, address=None):
+        if address == None:
+            if private_key == None:
+                self.private_key, self.address = generate_wallet()
+            else:
+                self.private_key = private_key
+                self.address = address_from_private_key(private_key)
+        else:
+            self.private_key = private_key
+            self.address = address
+                        
