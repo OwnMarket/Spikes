@@ -130,3 +130,199 @@ def test_remove_validator_action():
     tx.add_remove_validator_action()
     actual = tx.to_json()
     assert expected == actual    
+
+####################################################################################################
+## Actions: Asset Management
+####################################################################################################
+
+def test_add_transfer_asset_action():
+    sender_wallet = crypto.Wallet()
+    from_account_hash = 'FAccH1'
+    to_account_hash = 'TAccH1'
+    asset_hash = 'AssetH1'
+    amount = 100
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "TransferAsset",
+            "actionData": {
+                "fromAccountHash": "%s",
+                "toAccountHash": "%s",
+                "assetHash": "%s",
+                "amount": %d
+            }
+        }
+    ]
+}""" % (sender_wallet.address, from_account_hash, to_account_hash, asset_hash, amount)    
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_transfer_asset_action(from_account_hash, to_account_hash, asset_hash, amount)
+    actual = tx.to_json()
+    assert expected == actual
+    
+def test_create_asset_emission_action():
+    sender_wallet = crypto.Wallet()
+    emission_account_hash = 'EAccH1'
+    asset_hash = 'AssetH1'
+    amount = 100
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "CreateAssetEmission",
+            "actionData": {
+                "emissionAccountHash": "%s",
+                "assetHash": "%s",
+                "amount": %d
+            }
+        }
+    ]
+}""" % (sender_wallet.address, emission_account_hash, asset_hash, amount)    
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_create_asset_emission_action(emission_account_hash, asset_hash, amount)
+    actual = tx.to_json()
+    assert expected == actual
+    
+def test_create_asset_action():
+    sender_wallet = crypto.Wallet()
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "CreateAsset",
+            "actionData": {}
+        }
+    ]
+}""" % (sender_wallet.address)    
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_create_asset_action()
+    actual = tx.to_json()
+    assert expected == actual  
+    
+def test_create_asset_action_returns_asset_hash():
+    sender_wallet = crypto.Wallet()
+    nonce = 1
+    expected = crypto.derive_hash(sender_wallet.address, nonce, 1)    
+    
+    tx = transactions.Tx(sender_wallet.address, nonce, 0.01, 0)
+    actual = tx.add_create_asset_action()    
+    
+    assert expected == actual   
+
+def test_set_asset_code_action():
+    sender_wallet = crypto.Wallet()
+    asset_hash = 'AssetH1'
+    asset_code = 'AST1'
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "SetAssetCode",
+            "actionData": {
+                "assetHash": "%s",
+                "assetCode": "%s"
+            }
+        }
+    ]
+}""" % (sender_wallet.address, asset_hash, asset_code)    
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_set_asset_code_action(asset_hash, asset_code)
+    actual = tx.to_json()
+    assert expected == actual
+    
+def test_set_asset_controller_action():
+    sender_wallet = crypto.Wallet()
+    controllerWallet = crypto.Wallet()
+    asset_hash = 'AssetH1'
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "SetAssetController",
+            "actionData": {
+                "assetHash": "%s",
+                "controllerAddress": "%s"
+            }
+        }
+    ]
+}""" % (sender_wallet.address, asset_hash, controllerWallet.address)    
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_set_asset_controller_action(asset_hash, controllerWallet.address)
+    actual = tx.to_json()
+    assert expected == actual
+    
+def test_create_account_action():
+    sender_wallet = crypto.Wallet()
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "CreateAccount",
+            "actionData": {}
+        }
+    ]
+}""" % (sender_wallet.address)    
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_create_account_action()
+    actual = tx.to_json()
+    assert expected == actual  
+    
+def test_create_account_action_returns_account_hash():
+    sender_wallet = crypto.Wallet()
+    nonce = 1
+    expected = crypto.derive_hash(sender_wallet.address, nonce, 1)    
+    
+    tx = transactions.Tx(sender_wallet.address, nonce, 0.01, 0)
+    actual = tx.add_create_account_action()    
+    
+    assert expected == actual   
+
+def test_set_account_controller_action():
+    sender_wallet = crypto.Wallet()
+    controllerWallet = crypto.Wallet()
+    account_hash = 'AccountH1'
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "SetAccountController",
+            "actionData": {
+                "accountHash": "%s",
+                "controllerAddress": "%s"
+            }
+        }
+    ]
+}""" % (sender_wallet.address, account_hash, controllerWallet.address)    
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_set_account_controller_action(account_hash, controllerWallet.address)
+    actual = tx.to_json()
+    assert expected == actual
+    
