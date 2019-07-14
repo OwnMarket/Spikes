@@ -326,3 +326,238 @@ def test_set_account_controller_action():
     actual = tx.to_json()
     assert expected == actual
     
+####################################################################################################
+## Actions: Voting
+####################################################################################################
+
+def test_submit_vote_action():
+    sender_wallet = crypto.Wallet()
+    account_hash = 'AccountH1'
+    asset_hash = 'AssetH1'
+    resolution_hash = 'ResolutionH1'
+    vote_hash = 'VoteH1'
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "SubmitVote",
+            "actionData": {
+                "accountHash": "%s",
+                "assetHash": "%s",
+                "resolutionHash": "%s",
+                "voteHash": "%s"
+            }
+        }
+    ]
+}""" % (sender_wallet.address, account_hash, asset_hash, resolution_hash, vote_hash)  
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_submit_vote_action(account_hash, asset_hash, resolution_hash, vote_hash)
+    actual = tx.to_json()
+    assert expected == actual
+
+def test_submit_vote_weight_action():
+    sender_wallet = crypto.Wallet()
+    account_hash = 'AccountH1'
+    asset_hash = 'AssetH1'
+    resolution_hash = 'ResolutionH1'
+    vote_weight = 12345
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "SubmitVoteWeight",
+            "actionData": {
+                "accountHash": "%s",
+                "assetHash": "%s",
+                "resolutionHash": "%s",
+                "voteWeight": %d
+            }
+        }
+    ]
+}""" % (sender_wallet.address, account_hash, asset_hash, resolution_hash, vote_weight)  
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_submit_vote_weight_action(account_hash, asset_hash, resolution_hash, vote_weight)
+    actual = tx.to_json()
+    assert expected == actual
+    
+####################################################################################################
+## Actions: Eligibility
+####################################################################################################
+
+def test_set_account_eligibility_action():
+    sender_wallet = crypto.Wallet()
+    account_hash = 'AccountH1'
+    asset_hash = 'AssetH1'
+    is_primary_eligible = False
+    is_secondary_eligible = True
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "SetAccountEligibility",
+            "actionData": {
+                "accountHash": "%s",
+                "assetHash": "%s",
+                "isPrimaryEligible": false,
+                "isSecondaryEligible": true
+            }
+        }
+    ]
+}""" % (sender_wallet.address, account_hash, asset_hash)  
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_set_account_eligibility_action(account_hash, asset_hash, is_primary_eligible, is_secondary_eligible)
+    actual = tx.to_json()
+    assert expected == actual
+
+def test_set_asset_eligibility_action():
+    sender_wallet = crypto.Wallet()
+    asset_hash = 'AssetH1'
+    is_eligibility_required = True
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "SetAssetEligibility",
+            "actionData": {
+                "assetHash": "%s",
+                "isEligibilityRequired": true
+            }
+        }
+    ]
+}""" % (sender_wallet.address, asset_hash)  
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_set_asset_eligibility_action(asset_hash, is_eligibility_required)
+    actual = tx.to_json()
+    assert expected == actual
+    
+def test_add_change_kyc_controller_address_action():
+    sender_wallet = crypto.Wallet()
+    account_hash = 'FAccH1'
+    asset_hash = 'AssetH1'
+    kyc_controller_address = 'KycCtrlAddr1'
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "ChangeKycControllerAddress",
+            "actionData": {
+                "accountHash": "%s",
+                "assetHash": "%s",
+                "kycControllerAddress": "%s"
+            }
+        }
+    ]
+}""" % (sender_wallet.address, account_hash, asset_hash, kyc_controller_address)  
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_change_kyc_controller_address_action(account_hash, asset_hash, kyc_controller_address)
+    actual = tx.to_json()
+    assert expected == actual
+
+def test_add_kyc_provider_action():
+    sender_wallet = crypto.Wallet()
+    provider_address = crypto.Wallet().address        
+    asset_hash = 'AssetH1'
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "AddKycProvider",
+            "actionData": {
+                "assetHash": "%s",
+                "providerAddress": "%s"
+            }
+        }
+    ]
+}""" % (sender_wallet.address, asset_hash, provider_address)  
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_add_kyc_provider_address_action(asset_hash, provider_address)
+    actual = tx.to_json()
+    assert expected == actual
+    
+def test_remove_kyc_provider_action():
+    sender_wallet = crypto.Wallet()
+    provider_address = crypto.Wallet().address        
+    asset_hash = 'AssetH1'
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "RemoveKycProvider",
+            "actionData": {
+                "assetHash": "%s",
+                "providerAddress": "%s"
+            }
+        }
+    ]
+}""" % (sender_wallet.address, asset_hash, provider_address)  
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_remove_kyc_provider_address_action(asset_hash, provider_address)
+    actual = tx.to_json()
+    assert expected == actual
+
+####################################################################################################
+## Actions: Multiple
+####################################################################################################
+
+def test_transfer_chx_multiple_action():
+    sender_wallet = crypto.Wallet()
+    recipient_wallet1 = crypto.Wallet()
+    recipient_wallet2 = crypto.Wallet()
+    amount1 = 200
+    amount2 = 300
+    
+    expected = """{
+    "senderAddress": "%s",
+    "nonce": 1,
+    "expirationTime": 0,
+    "actionFee": 0.01,
+    "actions": [
+        {
+            "actionType": "TransferChx",
+            "actionData": {
+                "recipientAddress": "%s",
+                "amount": %d
+            }
+        },
+        {
+            "actionType": "TransferChx",
+            "actionData": {
+                "recipientAddress": "%s",
+                "amount": %d
+            }
+        }
+    ]
+}""" % (sender_wallet.address, recipient_wallet1.address, amount1, recipient_wallet2.address, amount2)  
+    tx = transactions.Tx(sender_wallet.address, 1, 0.01, 0)
+    tx.add_transfer_chx_action(recipient_wallet1.address, amount1)
+    tx.add_transfer_chx_action(recipient_wallet2.address, amount2)
+    actual = tx.to_json()
+    assert expected == actual
