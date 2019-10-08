@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Postgresql Benchmarking", "Postgresql Benchmarking\Postgresql Benchmarking.csproj", "{AD3B95C9-966B-4DD4-BB9F-9753BE38BBCF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD3B95C9-966B-4DD4-BB9F-9753BE38BBCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD3B95C9-966B-4DD4-BB9F-9753BE38BBCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD3B95C9-966B-4DD4-BB9F-9753BE38BBCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD3B95C9-966B-4DD4-BB9F-9753BE38BBCF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B85B3219-604F-4911-B473-C1CEDD9D6355}
+	EndGlobalSection
+EndGlobal

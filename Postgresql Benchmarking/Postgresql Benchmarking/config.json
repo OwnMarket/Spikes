@@ -1,0 +1,3 @@
+{  
+  "DbConnectionString": "database=test_keystore;user id=own_blockchain_node;password=testpass1;searchpath=own"
+}
