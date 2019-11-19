@@ -10,8 +10,9 @@ namespace Sockets
         public void StartListening()
         {
             Console.WriteLine("Started and listening");
-            server = new RouterSocket("@tcp://*:25702");
-            server.ReceiveReady += Server_ReceiveReady1;
+            server = new RouterSocket("@tcp://127.0.0.1:25702");
+            server.Options.Backlog = 1000;
+            server.ReceiveReady += Server_ReceiveReady;
 
             using (var poller = new NetMQPoller())
             {
@@ -21,21 +22,20 @@ namespace Sockets
             }
         }
 
-        private void Server_ReceiveReady1(object sender, NetMQSocketEventArgs e)
+        private void Server_ReceiveReady(object sender, NetMQSocketEventArgs e)
         {
-            var fromClientMessage = server.ReceiveMultipartMessage();
-            var clientAddress = fromClientMessage[0];
-            var clientOriginalMessage = fromClientMessage[2].ConvertToString();
-            Console.WriteLine("From Client: {0}", clientOriginalMessage);
+            var fromClientMessage = new NetMQMessage();
+            while (server.TryReceiveMultipartMessage(ref fromClientMessage))
+            {
+                var clientAddress = fromClientMessage[0];
+                var clientOriginalMessage = fromClientMessage[1].ConvertToString();
+                Console.WriteLine("From Client: {0}", clientOriginalMessage);
 
-            System.Threading.Thread.Sleep(500);
-
-            var messageToClient = new NetMQMessage();
-            messageToClient.Append(clientAddress);
-            messageToClient.AppendEmptyFrame();
-            messageToClient.Append(clientOriginalMessage);
-            e.Socket.SendMultipartMessage(messageToClient);
-            Console.WriteLine("Sent back to client");
+                var messageToClient = new NetMQMessage();
+                messageToClient.Append(clientAddress);
+                messageToClient.Append(clientOriginalMessage);
+                e.Socket.SendMultipartMessage(messageToClient);
+            }
         }
     }
 }

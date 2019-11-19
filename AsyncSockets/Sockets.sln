@@ -5,9 +5,7 @@ VisualStudioVersion = 15.0.28010.2041
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sockets", "AsyncSockets\Sockets.csproj", "{37C1B2DC-DCA9-4D99-AA0A-300726081452}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetMQClient", "NetMQClient\NetMQClient.csproj", "{D9860E88-D973-460B-8BA6-825CF34F59D2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetMQClientPush", "NetMQClientPush\NetMQClientPush.csproj", "{75F89248-E882-41E2-8F91-44DDAD3AE860}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetMQClient", "NetMQClient\NetMQClient.csproj", "{D9860E88-D973-460B-8BA6-825CF34F59D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{D9860E88-D973-460B-8BA6-825CF34F59D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9860E88-D973-460B-8BA6-825CF34F59D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9860E88-D973-460B-8BA6-825CF34F59D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{75F89248-E882-41E2-8F91-44DDAD3AE860}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{75F89248-E882-41E2-8F91-44DDAD3AE860}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{75F89248-E882-41E2-8F91-44DDAD3AE860}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{75F89248-E882-41E2-8F91-44DDAD3AE860}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

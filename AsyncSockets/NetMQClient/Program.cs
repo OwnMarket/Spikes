@@ -7,11 +7,17 @@ namespace NetMQClient
     {
         static void Main(string[] args)
         {
-            var client1 = new NetMQClient(args[0]);
-            Task.Factory.StartNew(() => client1.StartSending());
-            Console.ReadLine();
+            Task.Factory.StartNew(() =>
+            {
+                for (var i = 1; i <= 500; i++)
+                {
+                    var index = i;
+                    Task.Factory.StartNew(() => new NetMQClient().StartSending(index));
+                }
+            });
 
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Press any key to finish!");
+            Console.ReadLine();
         }
     }
 }
