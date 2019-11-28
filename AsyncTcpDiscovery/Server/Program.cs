@@ -85,7 +85,6 @@ namespace TcpDiscovery
             Task.Run(async () =>
             {
                 int i;
-
                 // Loop to receive all the data sent by the client.
                 while ((i = await stream.ReadAsync(bytes, 0, bytes.Length)) != 0)
                 {
@@ -93,7 +92,6 @@ namespace TcpDiscovery
                     data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
                     Console.WriteLine("Received: {0}", data);
                 }
-
             });
 
             // WRITE

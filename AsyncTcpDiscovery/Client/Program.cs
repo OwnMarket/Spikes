@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-
     class TCPClient
     {
         public static async Task Connect(int id)
@@ -29,19 +28,16 @@ namespace Client
                     await stream.WriteAsync(data, 0, data.Length);
                     Console.WriteLine("Sent: {0}", id);
 
-                    await Task.Run(async () =>
-                    {
-                        // Buffer to store the response bytes.
-                        data = new byte[256];
+                    // Buffer to store the response bytes.
+                    data = new byte[256];
 
-                        // String to store the response ASCII representation.
-                        var responseData = string.Empty;
+                    // String to store the response ASCII representation.
+                    var responseData = string.Empty;
 
-                        // Read the first batch of the TcpServer response bytes.
-                        var bytes = await stream.ReadAsync(data, 0, data.Length);
-                        responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-                        Console.WriteLine("Received: {0}", responseData);
-                    });
+                    // Read the first batch of the TcpServer response bytes.
+                    var bytes = await stream.ReadAsync(data, 0, data.Length);
+                    responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
+                    Console.WriteLine("Received: {0}", responseData);
                 }
             }
             catch (ArgumentNullException e)
@@ -52,9 +48,6 @@ namespace Client
             {
                 Console.WriteLine("SocketException: {0}", e);
             }
-
-            //Console.WriteLine("\n Press Enter to continue...");
-            //Console.Read();
         }
     }
     class Program

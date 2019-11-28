@@ -74,23 +74,63 @@ let acceptClientConnected (ar : IAsyncResult) =
     // stream.Close()
     // client.Close()
 
+let handleServerRequest (client :TcpClient) =
+
+    let bytes = Array.zeroCreate<byte>(256)
+    let stream = client.GetStream()
+
+    let mutable readBytes = 0;
+    let mutable msg = Array.zeroCreate<byte>(200)
+    let mutable data = ""
+
+    let readOnly () =
+        async {
+            // Console.WriteLine "Reading reading"
+
+            let! bts =
+                stream.ReadAsync(bytes, 0, bytes.Length)
+                |> Async.AwaitTask
+
+            readBytes <- bts
+            if readBytes <> 0 then
+                data <- System.Text.Encoding.ASCII.GetString(bytes, 0, readBytes);
+                Console.WriteLine("Received: {0}", data);
+        }
+
+    let writeOnly () =
+        async {
+            let mutable dataSent = false;
+            let rec reply () =
+                async {
+                    if not (String.IsNullOrEmpty(data)) then
+                        let data = data.ToUpper()
+                        msg <- System.Text.Encoding.ASCII.GetBytes(data)
+
+                        // Send back a response.
+                        do! stream.AsyncWrite(msg, 0, msg.Length)
+
+                        Console.WriteLine "Server sent data"
+                        dataSent <- true
+                        client.Close()
+                    else
+                        if not dataSent then
+                            return! reply()
+                }
+            reply () |> Async.Start
+        }
+
+    readOnly () |> Async.Start
+    writeOnly ()
 
 let startReading () =
     server.Start ()
 
     while true do
-        tcpClientConnected.Reset() |> ignore
-        Console.WriteLine("Waiting for a connection...");
-
-        // Accept the connection.
-        // BeginAcceptSocket() creates the accepted socket.
-        server.BeginAcceptTcpClient(new AsyncCallback(acceptClientConnected), server) |> ignore
-
-        // Wait until a connection is made and processed before
-        // continuing.
-        tcpClientConnected.WaitOne() |> ignore
-
-
+        let client = server.AcceptTcpClient()
+        async {
+        try do! handleServerRequest client with e -> ()
+        }
+        |> Async.Start
 
 [<EntryPoint>]
 let main argv =
@@ -101,5 +141,4 @@ let main argv =
     |> Async.Start
 
     Console.ReadLine () |> ignore
-
     0
