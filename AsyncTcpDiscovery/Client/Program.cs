@@ -16,19 +16,21 @@ namespace Client
                 // connected to the same address as specified by the server, port
                 // combination.
                 Int32 port = 13000;
+                byte[] data;
                 using (var client = new TcpClient("127.0.0.1", port))
                 {
                     // Translate the passed message into ASCII and store it as a Byte array.
-                    Byte[] data = System.Text.Encoding.ASCII.GetBytes(id.ToString());
+                    data = System.Text.Encoding.ASCII.GetBytes(id.ToString());
 
                     // Get a client stream for reading and writing.
-                    using (var stream = client.GetStream())
+                    var stream = client.GetStream();
+
+                    // Send the message to the connected TcpServer.
+                    await stream.WriteAsync(data, 0, data.Length);
+                    Console.WriteLine("Sent: {0}", id);
+
+                    await Task.Run(async () =>
                     {
-                        // Send the message to the connected TcpServer.
-                        await stream.WriteAsync(data, 0, data.Length);
-
-                        Console.WriteLine("Sent: {0}", id);
-
                         // Buffer to store the response bytes.
                         data = new byte[256];
 
@@ -39,12 +41,7 @@ namespace Client
                         var bytes = await stream.ReadAsync(data, 0, data.Length);
                         responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
                         Console.WriteLine("Received: {0}", responseData);
-
-                        // Close everything.
-                        //stream.Close();
-                        //client.Close();
-                    }
-
+                    });
                 }
             }
             catch (ArgumentNullException e)

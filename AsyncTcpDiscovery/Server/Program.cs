@@ -81,29 +81,38 @@ namespace TcpDiscovery
 
             // Get a stream object for reading and writing
             NetworkStream stream = client.GetStream();
-
+            // READ
             Task.Run(async () =>
             {
                 int i;
+
                 // Loop to receive all the data sent by the client.
                 while ((i = await stream.ReadAsync(bytes, 0, bytes.Length)) != 0)
                 {
                     // Translate data bytes to a ASCII string.
                     data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
                     Console.WriteLine("Received: {0}", data);
-
-                    // Process the data sent by the client.
-                    data = data.ToUpper();
-
-                    var msg = System.Text.Encoding.ASCII.GetBytes(data);
-
-                    // Send back a response.
-                    await stream.WriteAsync(msg, 0, msg.Length);
-                    //Console.WriteLine("Sent: {0}", data);
                 }
 
-                // Shutdown and end connection
-                client.Close();
+            });
+
+            // WRITE
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        data = data.ToUpper();
+
+                        var msg = System.Text.Encoding.ASCII.GetBytes(data);
+
+                        // Send back a response.
+                        await stream.WriteAsync(msg, 0, msg.Length);
+                        client.Close();
+                        break;
+                    }
+                }
             });
         }
     }
